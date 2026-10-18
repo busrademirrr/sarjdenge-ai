@@ -1,0 +1,11 @@
+numpy
+pandas
+scipy
+scikit-learn
+matplotlib
+tabulate
+acnportal
+setuptools<81
+pytest
+streamlit
+pyyaml

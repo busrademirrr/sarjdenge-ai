@@ -1,0 +1,17 @@
+{
+  "name": "sarjdenge-server",
+  "version": "1.0.0",
+  "description": "ŞarjDenge AI — Site Yöneticisi Karar Destek API Servisi",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js",
+    "test": "node --test tests/server.test.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}

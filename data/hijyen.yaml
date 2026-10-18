@@ -1,0 +1,30 @@
+# ŞarjDenge AI — Veri Hijyeni ve Filtreleme Yapılandırması
+# Tüm eşikler burada dışsallaştırılmıştır; kod içinde sabit sayı bulunmaz.
+
+filtreler:
+  min_sure_dk: 30.0               # 30 dakikadan kısa oturumlar elenir
+  max_sure_saat: 48.0             # 48 saatten (2880 dk) uzun oturumlar elenir
+  min_kwh: 0.5                    # 0.5 kWh altı teslimatlar elenir (başarısız/test oturumları)
+  beyan_min_gecikme_dk: -5.0      # Bağlantı öncesi en fazla 5 dk erken beyan kabul edilir
+  beyan_max_gecikme_dk: 30.0      # Bağlantı sonrası en fazla 30 dk gecikmeli beyan "bağlantı anında bilinen" sayılır
+
+zaman:
+  varsayilan_tz: "America/Los_Angeles"  # ACN Caltech/JPL sahaları için yerel zaman dilimi
+  turkiye_tz: "Europe/Istanbul"         # Türkiye senaryoları için yerel zaman dilimi
+
+hedefler:
+  sure_hedefi: "sure_dk"                # disconnectTime - connectionTime (dakika)
+  enerji_hedefi: "kWhDelivered"         # Tarihsel teslim enerjisi / ihtiyaç göstergesi (kWh)
+
+ozellikler:
+  kullanici_gecmis_kolonlari:
+    - sure_dk
+    - kWhDelivered
+  kullanici_gecmis_isimleri:
+    - gecmis_sure
+    - gecmis_kwh
+    - gecmis_n
+
+saha_kodlari:
+  Caltech: "2"    # ACN API siteID = 2 (5.762 oturum Oca-Haz; 4.850 oturum Tem-Ara)
+  JPL: "1"        # ACN API siteID = 1 (8.610 oturum Oca-Haz; 8.734 oturum Tem-Ara)

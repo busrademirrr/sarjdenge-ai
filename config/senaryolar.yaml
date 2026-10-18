@@ -1,0 +1,165 @@
+# ==============================================================================
+# ŞarjDenge AI — Sentetik Veri v2 Senaryo ve Parametre Yapılandırması
+# ==============================================================================
+# Her parametre için kaynak türü açıkça belirtilmiştir:
+#   - ACN       : ACN-Data ampirik dağılımlarından kalibre edilmiştir.
+#   - KAYNAKLI  : Resmî kurum, regülasyon, teknik katalog veya literatür verisidir.
+#   - VARSAYIM  : Türkiye saha/anket verisi bulunmadığı için modelleme varsayımıdır.
+#                 Tüm varsayımlar için duyarlılık aralığı [min, tipik, max] tanımlıdır.
+# ==============================================================================
+
+genel:
+  uretici_surumu: "2.0.0"                      # uretici versiyonu
+  varsayilan_tohum: 42                         # tekrarlanabilir üretim tohumu
+  zaman_dilimi: "Europe/Istanbul"              # KAYNAKLI: Türkiye Standart Saati (UTC+3)
+  ac_kayip_orani: 0.10                         # KAYNAKLI: AC-DC dönüştürücü ve kablo kaybı %10 (SAE J2847, EPRI EV Efficiency)
+  sarj_verimi: 0.90                            # KAYNAKLI: Şarj sistemi net verimi %90 (1 - 0.10)
+  tatiller_tr_2026:                            # KAYNAKLI: T.C. Resmî Tatil Günleri 2026 Takvimi
+    - "2026-01-01"  # Yılbaşı
+    - "2026-03-20"  # Ramazan Bayramı Arifesi
+    - "2026-03-21"  # Ramazan Bayramı 1. Gün
+    - "2026-03-22"  # Ramazan Bayramı 2. Gün
+    - "2026-03-23"  # Ramazan Bayramı 3. Gün
+    - "2026-04-23"  # Ulusal Egemenlik ve Çocuk Bayramı
+    - "2026-05-01"  # Emek ve Dayanışma Günü
+    - "2026-05-19"  # Atatürk'ü Anma, Gençlik ve Spor Bayramı
+    - "2026-05-27"  # Kurban Bayramı Arifesi
+    - "2026-05-28"  # Kurban Bayramı 1. Gün
+    - "2026-05-29"  # Kurban Bayramı 2. Gün
+    - "2026-05-30"  # Kurban Bayramı 3. Gün
+    - "2026-05-31"  # Kurban Bayramı 4. Gün
+    - "2026-07-15"  # 15 Temmuz Demokrasi ve Millî Birlik Günü
+    - "2026-08-30"  # Zafer Bayramı
+    - "2026-10-29"  # Cumhuriyet Bayramı
+
+# ------------------------------------------------------------------------------
+# Senaryo 1: isyeri_gunduz
+# Kurumsal ofis/kampüs gündüz şarjı. ACN-Data ampirik verisi ile kalibre edilmiştir.
+# ------------------------------------------------------------------------------
+isyeri_gunduz:
+  aciklama: "Türkiye İş Yeri / Ofis Kampüsü Gündüz Şarjı (ACN Kalibrasyonlu)"
+  site_id: "TR_ISYERI"
+  kalibrasyon_tipi: "ACN_AMPIRIK"              # ACN JPL/Caltech ampirik verisinden ortak örnekleme
+  soket_sayisi: 30                             # VARSAYIM [min: 10, tipik: 30, max: 60] (Ofis otoparkı şarj soketi)
+  sebeke_kapasitesi_kw: 150.0                  # VARSAYIM [min: 60.0, tipik: 150.0, max: 300.0] (İş yeri trafo tahsis gücü)
+  soket_gucu_kw: 22.0                          # KAYNAKLI: EPDK Şarj Hizmeti Yönetmeliği Md. 14 / Standart Tip-2 AC Soket
+  arac_obc_kw: 11.0                            # KAYNAKLI: Togg T10X / Tesla Model Y / VW ID.4 Standart On-Board Charger Gücü
+  arac_sayisi_havuz: 75                        # VARSAYIM [min: 30, tipik: 75, max: 150] (Kayıtlı şirket çalışanı EV filosu)
+  arac_olasiligi_haftaici: 0.70                # VARSAYIM [min: 0.40, tipik: 0.70, max: 0.95] (Hafta içi soket doluluk oranı)
+  hafta_sonu_carpani: 0.12                     # VARSAYIM [min: 0.05, tipik: 0.12, max: 0.25] (Hafta sonu iş yeri çalışma oranı)
+  tatil_carpani: 0.05                          # VARSAYIM [min: 0.00, tipik: 0.05, max: 0.15] (Resmî tatil doluluk çarpanı)
+  kis_enerji_carpani: 1.00                     # VARSAYIM [min: 1.00, tipik: 1.15, max: 1.30] (ACN baz kalibrasyonu için 1.00; AAA/ADAC menzil kaybı testlerinden esinlenen kış artışı duyarlılık analizinde incelenir)
+  ev_buyume_orani_yillik: 0.25                 # KAYNAKLI: EPDK ve ODD Türkiye EV Satış Projeksiyonu (%25 yıllık büyüme)
+  
+  # ACN ampirik dağılım parametreleri (Ortak örnekleme yedek parametreleri)
+  varis_saat_aralik: [6.5, 12.0]               # ACN ampirik aralık: Sabah işe varış yoğunluğu
+  sure_dk_medyan: 480.0                        # ACN ampirik medyan: 8 saat tipik mesai
+  sure_dk_sd: 120.0                            # ACN ampirik dağılım yayılımı
+  kwh_medyan: 13.5                             # ACN ampirik medyan teslim enerjisi
+  beyan_kayma_dk_ort: 33.0                     # ACN ampirik: Kullanıcının beyan ettiği süreden ort. 33 dk sapması
+  beyan_kayma_dk_sd: 60.0                      # ACN ampirik sapma standart sapması
+  beyan_kwh_carpan_aralik: [1.05, 1.45]        # ACN ampirik: Beyan edilen enerjinin gerçek teslimattan fazla olma oranı
+
+# ------------------------------------------------------------------------------
+# Senaryo 2: apartman_gece
+# Toplu konut / site akşam-gece şarjı. ACN karşılığı YOKTUR; tamamen VARSAYIM modelidir.
+# ------------------------------------------------------------------------------
+apartman_gece:
+  aciklama: "Türkiye Apartman / Site Otoparkı Gece Şarjı (ACN Karşılığı Olmayan Sentetik Model)"
+  site_id: "TR_APT"
+  kalibrasyon_tipi: "VARSAYIM_MODELI"          # ACN karşılığı yoktur; tüm parametreler varsayımdır
+  soket_sayisi: 20                             # VARSAYIM [min: 10, tipik: 20, max: 50] (Site ortak/tahsisli otoparkı)
+  sebeke_kapasitesi_kw: 80.0                   # VARSAYIM [min: 40.0, tipik: 80.0, max: 180.0] (Apartman ortak trafo ayrılan payı)
+  soket_gucu_kw: 11.0                          # KAYNAKLI: Konut tipi 3-faz 16A AC Wallbox norm gücü (TSE K 603 / EPDK)
+  arac_obc_kw: 11.0                            # KAYNAKLI: Togg T10X 11 kW Dahili Şarj Ünitesi
+  arac_sayisi_havuz: 45                        # VARSAYIM [min: 20, tipik: 45, max: 90] (Sitedeki elektrikli araç sahibi sayısı)
+  arac_olasiligi_haftaici: 0.65                # VARSAYIM [min: 0.35, tipik: 0.65, max: 0.85] (Gece şarja takma olasılığı)
+  hafta_sonu_carpani: 0.85                     # VARSAYIM [min: 0.60, tipik: 0.85, max: 1.00] (Hafta sonu eve dönüş/kalma çarpanı)
+  tatil_carpani: 0.80                          # VARSAYIM [min: 0.50, tipik: 0.80, max: 1.00] (Tatil günleri site içi kullanım çarpanı)
+  kis_enerji_carpani: 1.20                     # VARSAYIM [min: 1.00, tipik: 1.20, max: 1.35] (Kış dönemi kabin ön ısıtma ve batarya kondisyonlama kaynaklı tüketim artış varsayımı)
+  ev_buyume_orani_yillik: 0.30                 # KAYNAKLI: Konut tipi EV şarj noktası yaygınlaşma tahmini (%30)
+  
+  # Konut davranışı parametreleri (VARSAYIM [min, tipik, max])
+  varis_saat_ort: 19.25                        # VARSAYIM [min: 17.5, tipik: 19.25, max: 21.0] (Akşam eve dönüş: 19:15)
+  varis_saat_sd: 1.20                          # VARSAYIM [min: 0.8, tipik: 1.20, max: 1.8] (Varış saati varyansı)
+  cikis_saat_ort: 7.75                         # VARSAYIM [min: 6.5, tipik: 7.75, max: 9.0] (Sabah evden çıkış: 07:45)
+  cikis_saat_sd: 0.60                          # VARSAYIM [min: 0.4, tipik: 0.60, max: 1.0] (Sürücünün temel alışkanlık yayılımı)
+  cikis_gunluk_sapma_sd: 0.45                  # VARSAYIM [min: 0.25, tipik: 0.45, max: 0.75] (Günden güne sapma saati)
+  gunluk_yol_km_medyan: 42.0                   # KAYNAKLI: TİK (Türkiye İstatistik Kurumu) Şehir İçi Günlük Otomobil Kat Edilen Mesafe Ort.
+  tuketim_kwh_100km: 18.5                      # KAYNAKLI: Togg T10X Karma WLTP Tüketim Değeri (18.5 kWh/100 km)
+  kwh_ihtiyac_log_ort: 2.35                    # VARSAYIM: Günlük ~10.5 kWh enerji ihtiyacı (42 km x 0.185 kWh/km + kayıp)
+  kwh_ihtiyac_log_sd: 0.45                     # VARSAYIM: Enerji ihtiyacı değişkenliği
+  kwh_ihtiyac_ust_sinir: 65.0                  # KAYNAKLI: Togg T10X V2 Uzun Menzil Batarya Net Kapasitesi (88.5 kWh brüt / 65 kWh max tek seferde dolum)
+  beyan_kayma_dk_ort: 30.0                     # VARSAYIM [min: 15.0, tipik: 30.0, max: 60.0] (Apartmanda erken/geç çıkış sapması)
+  beyan_kayma_dk_sd: 75.0                      # VARSAYIM [min: 40.0, tipik: 75.0, max: 120.0] (Sapma standart sapması)
+  beyan_kwh_carpan_aralik: [1.10, 1.55]        # VARSAYIM [min: 1.05, tipik: [1.10, 1.55], max: 1.80] (Kullanıcı aşırı enerji beyanı)
+
+# ------------------------------------------------------------------------------
+# Senaryo 3: karma
+# Gündüz çalışanları ve gece site sakinlerinin aynı otoparkı paylaştığı karma kullanım.
+# ------------------------------------------------------------------------------
+karma:
+  aciklama: "Türkiye Karma Kullanımlı Yerleşke (Gündüz İş Yeri + Gece Konut Sakinleri)"
+  site_id: "TR_KARMA"
+  kalibrasyon_tipi: "HIBRIT"                   # Gündüz ACN kalibrasyonlu, gece varsayım modelli
+  soket_sayisi: 40                             # VARSAYIM [min: 20, tipik: 40, max: 80]
+  sebeke_kapasitesi_kw: 200.0                  # VARSAYIM [min: 100.0, tipik: 200.0, max: 400.0]
+  soket_gucu_kw: 22.0                          # KAYNAKLI: Standart AC Soket
+  arac_obc_kw: 11.0                            # KAYNAKLI: Tipik 11 kW On-Board Charger
+  gunduz_arac_orani: 0.55                      # VARSAYIM: Gündüz mesai saatlerinde doluluk oranı
+  gece_arac_orani: 0.60                        # VARSAYIM: Gece sakinleri doluluk oranı
+  hafta_sonu_carpani: 0.70                     # VARSAYIM
+  tatil_carpani: 0.65                          # VARSAYIM
+  kis_enerji_carpani: 1.18                     # KAYNAKLI
+  ev_buyume_orani_yillik: 0.28                 # KAYNAKLI
+  gunduz_havuz: 70                             # VARSAYIM
+  gece_havuz: 50                               # VARSAYIM
+
+# ------------------------------------------------------------------------------
+# Duyarlılık Analizi Aralık Setleri (Sensitivity Analysis Grid)
+# ------------------------------------------------------------------------------
+duyarlilik:
+  isyeri_gunduz:
+    min:
+      soket_sayisi: 10
+      arac_sayisi_havuz: 25
+      sebeke_kapasitesi_kw: 60.0
+      arac_olasiligi_haftaici: 0.40
+      kis_enerji_carpani: 1.05
+    tipik:
+      soket_sayisi: 30
+      arac_sayisi_havuz: 75
+      sebeke_kapasitesi_kw: 150.0
+      arac_olasiligi_haftaici: 0.70
+      kis_enerji_carpani: 1.15
+    max:
+      soket_sayisi: 60
+      arac_sayisi_havuz: 120
+      sebeke_kapasitesi_kw: 300.0
+      arac_olasiligi_haftaici: 0.95
+      kis_enerji_carpani: 1.30
+  apartman_gece:
+    min:
+      soket_sayisi: 10
+      arac_sayisi_havuz: 20
+      sebeke_kapasitesi_kw: 40.0
+      arac_olasiligi_haftaici: 0.35
+      kis_enerji_carpani: 1.10
+      varis_saat_ort: 17.5
+      cikis_saat_ort: 6.5
+    tipik:
+      soket_sayisi: 20
+      arac_sayisi_havuz: 45
+      sebeke_kapasitesi_kw: 80.0
+      arac_olasiligi_haftaici: 0.65
+      kis_enerji_carpani: 1.20
+      varis_saat_ort: 19.25
+      cikis_saat_ort: 7.75
+    max:
+      soket_sayisi: 50
+      arac_sayisi_havuz: 90
+      sebeke_kapasitesi_kw: 180.0
+      arac_olasiligi_haftaici: 0.85
+      kis_enerji_carpani: 1.35
+      varis_saat_ort: 21.0
+      cikis_saat_ort: 9.0

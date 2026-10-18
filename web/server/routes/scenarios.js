@@ -1,0 +1,95 @@
+import { Router } from 'express';
+
+const router = Router();
+
+export const SCENARIOS = [
+  {
+    id: 'isyeri_gunduz',
+    name: 'Türkiye İş Yeri Kampüsü',
+    subName: '30 Soket • 22 kW Tip-2 • 150 kW Trafo',
+    badge: 'SENTETİK MODEL (VARSAYIM)',
+    badgeType: 'synthetic',
+    dataSource: 'ACN JPL/Caltech ampirik verisi ile kalibre edilmiş kurumsal gündüz mesai şarjı.',
+    description: '08:00–18:00 saatleri arasında şirket çalışanlarının şarj talebi. ACN ampirik varış ve süre dağılımlarıyla kalibre edilmiştir.',
+    defaultF: 0.5,
+    defaultDay: '2026-03-10',
+    availableDays: ['2026-03-10', '2026-03-11', '2026-03-12', '2026-03-17', '2026-03-18'],
+    sockets: 30,
+    socketPowerKw: 22.0,
+    transformerKw: 150.0,
+    fleetPool: 75,
+  },
+  {
+    id: 'apartman_gece',
+    name: 'Türkiye Apartman / Site Otoparkı',
+    subName: '20 Soket • 11 kW Wallbox • 80 kW Trafo',
+    badge: 'SENTETİK MODEL (VARSAYIM)',
+    badgeType: 'synthetic',
+    dataSource: 'ACN karşılığı bulunmayan, tamamen Türkiye toplu konut varsayımlarıyla kurgulanmış akşam-gece şarj modeli.',
+    description: '18:30–08:00 saatleri arasında site sakinlerinin eve dönüş ve gece şarjı. Togg T10X / TSE K 603 standartları esas alınmıştır.',
+    defaultF: 0.5,
+    defaultDay: '2026-03-10',
+    availableDays: ['2026-03-10', '2026-03-11', '2026-03-12', '2026-03-17', '2026-03-18'],
+    sockets: 20,
+    socketPowerKw: 11.0,
+    transformerKw: 80.0,
+    fleetPool: 45,
+  },
+  {
+    id: 'karma',
+    name: 'Türkiye Karma Yerleşke (İş + Konut)',
+    subName: '40 Soket • 22 kW AC • 200 kW Trafo',
+    badge: 'SENTETİK MODEL (VARSAYIM)',
+    badgeType: 'synthetic',
+    dataSource: 'Gündüz çalışanları ve gece site sakinlerinin aynı otopark altyapısını paylaştığı hibrit model.',
+    description: 'Gündüz kurumsal ofis çalışanları, gece site sakinleri aynı şarj istasyonlarını dinamik paylaşır.',
+    defaultF: 0.5,
+    defaultDay: '2026-03-10',
+    availableDays: ['2026-03-10', '2026-03-11', '2026-03-12', '2026-03-17', '2026-03-18'],
+    sockets: 40,
+    socketPowerKw: 22.0,
+    transformerKw: 200.0,
+    fleetPool: 120,
+  },
+  {
+    id: 'acn_gercek_val',
+    name: 'ACN Gerçek Saha — Doğrulama Dönemi',
+    subName: 'JPL / Caltech 2019 • 68 Sıkışık Gün • 5.207 Oturum',
+    badge: 'GERÇEK SAHA VERİSİ (ACN-Data)',
+    badgeType: 'real',
+    dataSource: 'Kaliforniya Teknoloji Enstitüsü (Caltech) ve NASA JPL sahalarının Ocak–Haziran 2019 doğrulanmış saha ölçümleri.',
+    description: 'Ön kayıt ve deney protokolüne uygun olarak test edilen 68 sıkışık günün gerçek 15 dakikalık telemetrisi.',
+    defaultF: 0.5,
+    defaultDay: '2019-04-23',
+    availableDays: ['2019-04-23', '2019-04-30', '2019-05-13', '2019-05-16', '2019-04-22', '2019-05-07'],
+    sockets: 54,
+    socketPowerKw: 6.6,
+    transformerKw: 140.0,
+    fleetPool: 250,
+  },
+  {
+    id: 'acn_gercek_ta',
+    name: 'ACN Gerçek Saha — Dönemler Arası Test',
+    subName: 'JPL / Caltech 2019 • 153 Gün • 11.911 Oturum',
+    badge: 'GERÇEK SAHA VERİSİ (ACN-Data)',
+    badgeType: 'real',
+    dataSource: 'Temmuz–Aralık 2019 dönemi bağımsız genelleştirme test verisi.',
+    description: 'Model ve MPC hattının zaman içindeki dayanıklılığını test etmek için kullanılan dönemler arası test kümesi.',
+    defaultF: 0.5,
+    defaultDay: '2019-10-15',
+    availableDays: ['2019-10-15', '2019-09-17', '2019-11-05', '2019-10-22', '2019-08-20'],
+    sockets: 54,
+    socketPowerKw: 6.6,
+    transformerKw: 140.0,
+    fleetPool: 280,
+  },
+];
+
+router.get('/', (req, res) => {
+  res.json({
+    success: true,
+    scenarios: SCENARIOS,
+  });
+});
+
+export default router;

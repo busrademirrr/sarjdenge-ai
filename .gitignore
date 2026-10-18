@@ -1,0 +1,47 @@
+﻿# Python caches and environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Node dependencies and production builds
+**/node_modules/
+**/dist/
+**/.vite/
+
+# Secrets and environment files
+.env
+.env.*
+!.env.example
+!.env.template
+
+# Raw ACN datasets at project root
+/acn_ocak_temmuz.csv
+/acn_oturumlar_ocak_haziran.csv
+/acn_oturumlar_temmuz_aralik.csv
+/acn_oturumlar_v2.csv
+
+# Raw ACN archive and 2020 holdout data
+/data/ham/
+/data/holdout_2020_01_02/
+
+# Local logs and editor files
+*.log
+.vscode/
+.idea/
+
+# Conservative data protection: CSV files excluded by default
+*.csv
+
+# Allow only reviewed aggregate experiment summaries
+!/data/deney_tablo_val.csv
+!/data/deney_boot_val.csv
+!/data/deney_tablo_ta.csv
+!/data/deney_boot_ta.csv
+
+# Generated or unreviewed data artifacts
+/data/sentetik/
+/demo_veri.json
+/grafik.png
