@@ -11,6 +11,7 @@ import BenchmarkView from './components/BenchmarkView.jsx';
 import MethodologyView from './components/MethodologyView.jsx';
 import ExportModal from './components/ExportModal.jsx';
 import AuthModal from './components/AuthModal.jsx';
+import Toast from './components/Toast.jsx';
 import { HelpCircle, ChevronRight, RefreshCw, Car } from 'lucide-react';
 import { formatTimeHour, formatPercent, formatKwh } from './utils/formatters.js';
 
@@ -27,6 +28,23 @@ export default function App() {
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  // Güvenli hata mesajı temizleyicisi (Token, header veya ham stack trace sızmasını önler)
+  const sanitizeErrorMessage = (msg) => {
+    if (!msg || typeof msg !== 'string') {
+      return 'Simülasyon yürütülürken beklenmeyen bir hata oluştu.';
+    }
+    let clean = msg
+      .replace(/bearer\s+[a-zA-Z0-9_\-\.]+/gi, '[KORUMALI]')
+      .replace(/(api[_-]?key|token|auth(orization)?)\s*[:=]\s*[^\s,]+/gi, '$1: [KORUMALI]')
+      .replace(/Traceback \(most recent call last\):[\s\S]*/gi, '')
+      .trim();
+    if (clean.length > 220) {
+      clean = clean.slice(0, 217) + '...';
+    }
+    return clean || 'Simülasyon yürütülürken bir hata oluştu.';
+  };
 
   // Initial Load: Fetch Scenarios, Session, and Benchmarks
   useEffect(() => {
@@ -80,15 +98,38 @@ export default function App() {
       const data = await res.json();
       if (data.success && data.simulation) {
         setSimulation(data.simulation);
+        setToast(null); // Başarılı simülasyonda önceki hata uyarısını kapat
       } else {
-        alert(data.error || 'Simülasyon yürütülürken hata oluştu.');
+        const errorText = sanitizeErrorMessage(data.error);
+        setToast({
+          id: Date.now(),
+          type: 'error',
+          title: 'Simülasyon Yürütülemedi',
+          message: errorText,
+          canRetry: true,
+          retryParams: { scId, fVal, dayVal },
+        });
       }
     } catch (err) {
       console.error('Simulation run error:', err);
-      alert('Simülasyon servisine bağlanılamadı.');
+      setToast({
+        id: Date.now(),
+        type: 'error',
+        title: 'Bağlantı Hatası',
+        message: 'Simülasyon servisine bağlanılamadı. Lütfen sunucunun çalıştığından emin olun.',
+        canRetry: true,
+        retryParams: { scId, fVal, dayVal },
+      });
     } finally {
       setLoading(false);
     }
+  };
+
+  // Toast üzerinden aynı parametrelerle yeniden deneme
+  const handleRetrySimulation = () => {
+    if (!toast?.retryParams || loading) return;
+    const { scId, fVal, dayVal } = toast.retryParams;
+    runSimulation(scId, fVal, dayVal);
   };
 
   // Run initial simulation once scenarios are ready
@@ -322,6 +363,14 @@ export default function App() {
           onClose={() => setIsAuthOpen(false)}
         />
       )}
+
+      {/* Accessible Toast Notification */}
+      <Toast
+        toast={toast}
+        onClose={() => setToast(null)}
+        onRetry={handleRetrySimulation}
+        retryLoading={loading}
+      />
     </div>
   );
 }
