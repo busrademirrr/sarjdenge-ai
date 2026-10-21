@@ -1,0 +1,50 @@
+﻿{
+  "versiyon": "1.0.0",
+  "tanim": "┼ŞarjDenge AI ÔÇö Veriden ├û─şrenilen Beyan Oran─▒ Kuantil Baseline'─▒",
+  "aciklama": "Kullan─▒c─▒n─▒n ilk beyan─▒ (minutesAvailable_ilk ve kWhRequested_ilk) ile ger├ğekle┼şen de─şerler (sure_dk ve kWhDelivered) aras─▒ndaki ampirik oran kuantilleri.",
+  "egitim_kaynagi": "acn_oturumlar_v2.csv",
+  "egitim_donemi_baslangic": "2019-01-01 00:00:00 America/Los_Angeles",
+  "egitim_donemi_bitis": "2019-04-18 23:59:59 America/Los_Angeles",
+  "kesim_gunu": "2019-04-19 00:00:00",
+  "egitim_satir_sayisi": 7808,
+  "dogrulama_satir_sayisi": 5315,
+  "filtreler": {
+    "sadece_beyanli": true,
+    "min_sure_dk": 30.0,
+    "max_sure_saat": 48.0,
+    "min_kwh": 0.5,
+    "girdi_gecikme_dk_aralik": [
+      -5.0,
+      30.0
+    ],
+    "gecerli_payda_kurali": "beyan_sure_dk > 0 ve kWhRequested > 0"
+  },
+  "sure_oranlari": {
+    "q20": 0.8889,
+    "q50": 1.1062,
+    "q80": 1.6352
+  },
+  "enerji_oranlari": {
+    "q20": 0.3549,
+    "q50": 0.6074,
+    "q80": 0.8446
+  },
+  "dogrulama_kapsam_sonuclari": {
+    "orneklem_sayisi": 5315,
+    "sure_kapsam": {
+      "q20_hedef_0.20": 0.1893,
+      "q50_hedef_0.50": 0.4856,
+      "q80_hedef_0.80": 0.7897
+    },
+    "enerji_kapsam": {
+      "q20_hedef_0.20": 0.1998,
+      "q50_hedef_0.50": 0.5074,
+      "q80_hedef_0.80": 0.8107
+    }
+  },
+  "fiziksel_sinirlar": {
+    "min_sure_dk": 30.0,
+    "min_kwh": 0.5,
+    "maks_kwh": 95.0
+  }
+}

@@ -1,76 +1,76 @@
-import React, { useState } from 'react';
-import { AlertCircle, ChevronDown, ChevronUp, CheckCircle2, Info, Sparkles } from 'lucide-react';
+﻿import React, { useState } from 'react';
+import { AlertCircle, ChevronDown, ChevronUp, CheckCircle2, Info } from 'lucide-react';
 
 export default function TransparencyBanner() {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-4 sm:p-5 shadow-lg shadow-amber-950/10 mb-6">
+    <div className="bg-white border border-slate-200/90 rounded-xl p-4 sm:p-5 shadow-2xs mb-6">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start space-x-3.5">
-          <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-400 mt-0.5 shrink-0">
-            <AlertCircle className="w-5 h-5" />
+          <div className="p-2 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 mt-0.5 shrink-0">
+            <AlertCircle className="w-5 h-5 text-slate-600" />
           </div>
           <div>
             <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                Bilimsel Şeffaflık Bildirimi
+              <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                ├ûnkay─▒tl─▒ Hipotez De─şerlendirmesi
               </span>
-              <span className="text-xs sm:text-sm font-bold text-white">
-                Ön Kayıtlı Ana Hipotez: Desteklenmedi (H₀ Korundu)
+              <span className="text-xs sm:text-sm font-bold text-slate-900">
+                ├ûnkay─▒tl─▒ hipotez desteklenmedi
               </span>
             </div>
-            <p className="text-xs text-slate-300 mt-1.5 leading-relaxed max-w-4xl">
-              Ön kayıt edilen <code className="text-amber-200 bg-slate-950 px-1.5 py-0.5 rounded border border-amber-500/20 font-mono text-[11px]">Δ = mpc_tahmin_guvenli - mpc_beyan ≥ +2,00 y.p.</code> eşiği sağlanamamıştır.
-              Tahmin destekli güvenli MPC, şebeke kapasitesini konservatif biçimde geleceğe rezerve ettiği için filo genelinde üstünlük sağlayamamış; termin odaklı <strong className="text-emerald-400 font-semibold">EDF (Earliest Deadline First) algoritması</strong> tüm kısıt düzeylerinde en yüksek başarıyı elde etmiştir.
+            <p className="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed max-w-4xl">
+              ├ûnkay─▒tl─▒ ba┼şar─▒ ├Âl├ğ├╝t├╝ kar┼ş─▒lanmad─▒: fark─▒n en az +2 y├╝zde puan olmas─▒ ve %95 g├╝ven aral─▒─ş─▒n─▒n alt s─▒n─▒r─▒n─▒n s─▒f─▒r─▒n ├╝zerinde bulunmas─▒ gerekiyordu.
+              G├Âzlenen davran─▒┼ş i├ğin olas─▒ a├ğ─▒klama (├ğal─▒┼şma hipotezi), konservatif q80 enerji ve q20 s├╝re tahminlerinin LP-MPC'de kapasiteyi erken ad─▒mlarda belirli ara├ğlara ay─▒rmas─▒d─▒r.
             </p>
           </div>
         </div>
 
         <button
           onClick={() => setExpanded(!expanded)}
-          className="flex items-center space-x-1.5 text-xs text-amber-300 hover:text-amber-200 font-medium px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/25 transition shrink-0 ml-2"
+          className="flex items-center space-x-1.5 text-xs text-slate-700 hover:text-slate-900 font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 transition shrink-0 ml-2"
         >
-          <span>{expanded ? 'Kapat' : 'Fiziksel Mekanizma & Kanıt'}</span>
+          <span>{expanded ? 'Kapat' : 'Olas─▒ Mekanizma & Bulgular'}</span>
           {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
         </button>
       </div>
 
       {expanded && (
-        <div className="mt-4 pt-4 border-t border-amber-500/20 grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs text-slate-300">
-          {/* Card 1: Eşleştirilmiş Bootstrap Sonuçları */}
-          <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800">
-            <div className="flex items-center space-x-2 text-amber-400 font-bold mb-2">
-              <Info className="w-4 h-4 shrink-0" />
-              <span>Eşleştirilmiş Bootstrap (B = 2.000)</span>
+        <div className="mt-4 pt-4 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs text-slate-700">
+          {/* Card 1: E┼şle┼ştirilmi┼ş Bootstrap Sonu├ğlar─▒ */}
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+            <div className="flex items-center space-x-2 text-slate-800 font-bold mb-2">
+              <Info className="w-4 h-4 shrink-0 text-slate-600" />
+              <span>E┼şle┼ştirilmi┼ş Bootstrap (B = 2.000)</span>
             </div>
-            <ul className="space-y-1.5 text-slate-400 text-[11px]">
-              <li>• <strong className="text-slate-200">f = 0,50:</strong> Δ = -0,17 y.p. (%95 GA: [-0,66, +0,28] y.p.)</li>
-              <li>• <strong className="text-slate-200">f = 0,70:</strong> Δ = -0,58 y.p. (%95 GA: [-1,06, -0,10] y.p.)</li>
-              <li>• <strong className="text-slate-200">f = 0,90:</strong> Δ = -0,02 y.p. (%95 GA: [-0,22, +0,17] y.p.)</li>
-              <li className="text-amber-300/90 pt-1 border-t border-slate-800/80">Tüm güven aralıkları sıfırı kapsamakta veya sıfırın altında kalmaktadır.</li>
+            <ul className="space-y-1.5 text-slate-600 text-xs">
+              <li>ÔÇó <strong className="text-slate-800">f = 0,50:</strong> ╬ö = -0,17 y.p. (%95 GA: [-0,66, +0,28] y.p.)</li>
+              <li>ÔÇó <strong className="text-slate-800">f = 0,70:</strong> ╬ö = -0,58 y.p. (%95 GA: [-1,06, -0,10] y.p.)</li>
+              <li>ÔÇó <strong className="text-slate-800">f = 0,90:</strong> ╬ö = -0,02 y.p. (%95 GA: [-0,22, +0,17] y.p.)</li>
+              <li className="text-slate-700 font-medium pt-1 border-t border-slate-200">S─▒f─▒r hipotezi reddedilemedi. G├╝ven aral─▒klar─▒ s─▒f─▒r─▒ kapsamakta veya alt─▒ndad─▒r.</li>
             </ul>
           </div>
 
-          {/* Card 2: Fiziksel Mekanizma */}
-          <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800">
-            <div className="flex items-center space-x-2 text-rose-400 font-bold mb-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>Hayalet Kapasite Rezervasyonu</span>
+          {/* Card 2: Olas─▒ Mekanizma */}
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+            <div className="flex items-center space-x-2 text-slate-800 font-bold mb-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-slate-600" />
+              <span>Olas─▒ Mekanizma (├çal─▒┼şma Hipotezi)</span>
             </div>
-            <p className="text-slate-400 text-[11px] leading-relaxed">
-              Modelin yüksek <code className="text-slate-200 bg-slate-900 px-1 rounded">q80 enerji</code> hedefini kısa <code className="text-slate-200 bg-slate-900 px-1 rounded">q20 süre</code> penceresinde tamamlama kısıtı, MPC çözücüsünün mevcut gücü geleceğe kilitlemesine yol açmıştır. Araçlar beklenen sürede ayrılmadığında kilitlenen kapasite atıl kalmış, diğer araçlar güçsüz bırakılmıştır.
+            <p className="text-slate-600 text-xs leading-relaxed">
+              G├Âzlenen davran─▒┼ş i├ğin olas─▒ a├ğ─▒klama: Y├╝ksek <code className="text-slate-800 bg-slate-200/60 px-1 rounded font-mono text-xs">q80 enerji</code> ve k─▒sa <code className="text-slate-800 bg-slate-200/60 px-1 rounded font-mono text-xs">q20 s├╝re</code> k─▒s─▒tlar─▒n─▒n, LP-MPC ├ğ├Âz├╝c├╝s├╝nde kapasiteyi erken ad─▒mlarda konservatif bi├ğimde belirli ara├ğlara ay─▒rmas─▒d─▒r (hayalet kapasite rezervasyonu).
             </p>
           </div>
 
-          {/* Card 3: Neden EDF Kazandı? */}
-          <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800">
-            <div className="flex items-center space-x-2 text-emerald-400 font-bold mb-2">
-              <CheckCircle2 className="w-4 h-4 shrink-0" />
-              <span>Neden EDF Kazandı?</span>
+          {/* Card 3: De─şerlendirme Bulgusu */}
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+            <div className="flex items-center space-x-2 text-slate-800 font-bold mb-2">
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-slate-600" />
+              <span>De─şerlendirme Bulgusu</span>
             </div>
-            <p className="text-slate-400 text-[11px] leading-relaxed">
-              EDF geleceğe rezervasyon tutmaz. Yaklaşan ayrılış terminine göre gücü anlık dağıtarak o anki ayrılabilir şarj kapasitesini her adımda %100 kullanır. Erken ayrılan araçlarda <strong className="text-emerald-300">79,0%–89,0% başarı</strong> ve <strong className="text-emerald-300">p10 = 94,0%–98,0% adillik</strong> sağlamıştır.
+            <p className="text-slate-600 text-xs leading-relaxed">
+              Bu de─şerlendirmede EDF baz─▒ kapasite d├╝zeylerinde y├╝ksek hedef kar┼ş─▒lama sonu├ğlar─▒ vermi┼ştir. Algoritmalar─▒n performans─▒ kapasite d├╝zeyine ve kullan─▒lan metri─şe g├Âre kar┼ş─▒la┼şt─▒r─▒lmal─▒d─▒r.
             </p>
           </div>
         </div>

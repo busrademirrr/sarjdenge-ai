@@ -1,4 +1,4 @@
-process.env.NODE_ENV = 'test';
+﻿process.env.NODE_ENV = 'test';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import app from '../index.js';
@@ -67,13 +67,13 @@ test('Auth flow: Guest mode default and Google login simulation', async () => {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      mockUser: { name: 'Prof. Dr. Jüri', email: 'juri.prof@climathon.org' },
+      mockUser: { name: 'Prof. Dr. J├╝ri', email: 'juri.prof@climathon.org' },
     }),
   });
   const loginData = await loginRes.json();
   assert.equal(loginData.success, true);
   assert.equal(loginData.session.isGuest, false);
-  assert.equal(loginData.session.user.name, 'Prof. Dr. Jüri');
+  assert.equal(loginData.session.user.name, 'Prof. Dr. J├╝ri');
 
   // 3. Logout back to guest
   const logoutRes = await fetch(`${BASE_URL}/api/auth/logout`, { method: 'POST' });
@@ -101,7 +101,7 @@ test('POST /api/export/csv exports formatted csv with UTF-8 BOM', async () => {
         erken_ayrildi: false,
         teslim_kwh: { fcfs_beyan: 12.5, edf_beyan: 12.5, mpc_tahmin_guvenli: 12.5 },
         doyum_orani: { fcfs_beyan: 1.0, edf_beyan: 1.0, mpc_tahmin_guvenli: 1.0 },
-        neden_analizi: { ozet_hukum: 'Normal Planlı Şarj Tamamlandı' },
+        neden_analizi: { ozet_hukum: 'Normal Planl─▒ ┼Şarj Tamamland─▒' },
       },
     ],
   };
@@ -116,5 +116,28 @@ test('POST /api/export/csv exports formatted csv with UTF-8 BOM', async () => {
   const text = await res.text();
   assert.ok(text.includes('arac_id'));
   assert.ok(text.includes('EV-001'));
-  assert.ok(text.includes('Normal Planlı Şarj Tamamlandı'));
+  assert.ok(text.includes('Normal Planl─▒ ┼Şarj Tamamland─▒'));
 });
+
+test('POST /api/capacity-advisor returns valid 4-method analysis', { timeout: 25000 }, async () => {
+  const res = await fetch(`${BASE_URL}/api/capacity-advisor`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ scenarioId: 'isyeri_gunduz', day: '2026-03-10' }),
+  });
+
+  assert.equal(res.status, 200);
+  const data = await res.json();
+  assert.equal(data.success, true);
+  assert.ok(data.advisor);
+  assert.equal(data.advisor.sentetik_mi, true);
+  assert.equal(data.advisor.arac_sayisi, 23);
+  assert.ok(data.advisor.yontemler.length >= 4);
+
+  const yontemKodlari = data.advisor.yontemler.map(y => y.kod);
+  assert.ok(yontemKodlari.includes('fcfs'));
+  assert.ok(yontemKodlari.includes('edf'));
+  assert.ok(yontemKodlari.includes('esit'));
+  assert.ok(yontemKodlari.includes('mpc'));
+});
+

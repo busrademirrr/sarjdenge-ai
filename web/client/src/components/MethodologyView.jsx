@@ -1,101 +1,127 @@
-import React from 'react';
+﻿import React from 'react';
 import { BookOpen, CheckCircle2, AlertCircle, ShieldCheck, Cpu, GitCommit } from 'lucide-react';
+
+const CONCEPTS = [
+  {
+    id: 'yp-vs-pct',
+    icon: CheckCircle2,
+    iconColor: 'text-emerald-700',
+    title: 'Y├╝zde (%) ile Y├╝zde Puan─▒ (y.p.) Ayr─▒m─▒',
+    summary:
+      '─░ki ba┼şar─▒ oran─▒ aras─▒ndaki do─şrudan aritmetik fark y├╝zde puan─▒ (y.p.) ile ifade edilir; ├Ânkay─▒tl─▒ hipotez e┼şi─şimiz mutlak ╬ö ÔëÑ +2,00 y.p. olarak tan─▒mlanm─▒┼şt─▒r.',
+    details: [
+      'Y├╝zde Puan─▒ (y.p.): ├ûrne─şin %90 ba┼şar─▒dan %92 ba┼şar─▒ya ├ğ─▒k─▒┼ş tam olarak +2,00 y.p. mutlak art─▒┼şt─▒r.',
+      'G├Âreceli De─şi┼şim (%): Oran─▒n kendi ├╝zerindeki b├╝y├╝me y├╝zdesidir (%90ÔÇÖdan %92ÔÇÖye ├ğ─▒k─▒┼ş g├Âreceli %2,22 b├╝y├╝medir).',
+      '├ûnkay─▒t Kural─▒: Ba┼şar─▒ ├Âl├ğ├╝t├╝ ╬ö ÔëÑ +2,00 y.p. ve %95 g├╝ven aral─▒─ş─▒ alt s─▒n─▒r─▒n─▒n 0 ├╝zerinde olmas─▒d─▒r.',
+    ],
+  },
+  {
+    id: 'phantom-reservation',
+    icon: AlertCircle,
+    iconColor: 'text-amber-700',
+    title: 'Hayalet Kapasite Rezervasyonu (├çal─▒┼şma Hipotezi)',
+    summary:
+      'Konservatif q20 s├╝re ve q80 enerji tahminlerinin, LP-MPC ├ğ├Âz├╝c├╝s├╝nde erken ad─▒mlarda kapasiteyi belirli ara├ğlara ay─▒rarak di─şer ara├ğlar─▒n ┼şarj─▒n─▒ geciktirmi┼ş olabilece─şi de─şerlendirilmektedir.',
+    details: [
+      'Model, erken ayr─▒lma riskine kar┼ş─▒ kal─▒┼ş s├╝resini k─▒sa (q20) ve enerji talebini y├╝ksek (q80) tahmin eder.',
+      'LP-MPC ├ğ├Âz├╝c├╝s├╝ bu varsay─▒lan aciliyeti kar┼ş─▒lamak i├ğin erken ad─▒mlarda kapasiteyi belirli ara├ğlara y├Ânlendirir.',
+      'Bu a├ğ─▒klama kan─▒tlanm─▒┼ş nedensellik de─şil, sim├╝lasyon bulgular─▒yla uyumlu bir ├ğal─▒┼şma hipotezidir.',
+    ],
+  },
+  {
+    id: 'edf-dynamics',
+    icon: Cpu,
+    iconColor: 'text-emerald-700',
+    title: 'EDF Algoritmas─▒n─▒n ├çal─▒┼şma Dinamikleri',
+    summary:
+      'EDF (En Erken Ayr─▒l─▒┼ş ├ûncelikli), her 15 dakikal─▒k ad─▒mda prize ba─şl─▒ ara├ğlar─▒ ayr─▒l─▒┼ş terminine g├Âre s─▒ralar ve mevcut kapasiteyi gelecek ad─▒mlara rezervasyon kilitlemeden anl─▒k da─ş─▒t─▒r.',
+    details: [
+      'Ayr─▒l─▒┼ş─▒ en yak─▒n araca g├╝c├╝ an─▒nda verir, artan g├╝c├╝ s─▒radaki araca devreder.',
+      'Bu de─şerlendirmede EDF baz─▒ kapasite d├╝zeylerinde y├╝ksek hedef kar┼ş─▒lama sonu├ğlar─▒ vermi┼ştir.',
+      'Algoritmalar─▒n performans─▒ kapasite d├╝zeyine ve kullan─▒lan metri─şe g├Âre kar┼ş─▒la┼şt─▒r─▒lmal─▒d─▒r.',
+    ],
+  },
+  {
+    id: 'data-separation',
+    icon: ShieldCheck,
+    iconColor: 'text-emerald-700',
+    title: 'Ger├ğek Saha Verisi vs. Sentetik Model Ayr─▒m─▒',
+    summary:
+      'ACN-Data (Caltech ve JPL) ger├ğek saha telemetrisi ile T├╝rkiye apartman/i┼şyeri otoparklar─▒ i├ğin kurgulanan parametrik sentetik senaryolar birbirinden kesin olarak ayr─▒lm─▒┼şt─▒r.',
+    details: [
+      'Ger├ğek Saha Verisi: Caltech ve JPL sahalar─▒ndaki 2019 ACN-Data ├Âl├ğ├╝mleridir (do─şrulama protokol├╝nde 68 g├╝n, 5.207 oturum).',
+      'Sentetik Konut/─░┼şyeri Modeli: config/senaryolar.yaml i├ğindeki m├╝hendislik ve modelleme varsay─▒mlar─▒yla (tipik 11/22 kW AC g├╝├ğ ve g├╝nl├╝k s├╝r├╝┼ş enerjisi parametreleriyle) kurgulanan sim├╝lasyondur; resm├« kurum istatisti─şi de─şildir.',
+    ],
+  },
+  {
+    id: 'live-vs-offline',
+    icon: GitCommit,
+    iconColor: 'text-emerald-700',
+    title: 'Canl─▒ Kuantil Baseline vs. ├çevrimd─▒┼ş─▒ ML Modelleri',
+    summary:
+      'Canl─▒ sim├╝lasyon aray├╝z├╝nde ampirik beyan oran─▒ kuantilleri (q20 s├╝re, q80 enerji) ve HiGHS LP-MPC ├ğ├Âz├╝c├╝s├╝ ├ğal─▒┼ş─▒rken; ├ğevrimd─▒┼ş─▒ deney hatt─▒nda HGB/GBR kuantil regresyon modelleri de─şerlendirilmi┼ştir.',
+    details: [
+      'Canl─▒ Web Servisi (sarjdenge/web_servis.py): 2019 H1 e─şitim kesitinden (7.808 oturum) ├Â─şrenilen sabit kuantil oranlar─▒ (q20 = 0,8889 s├╝re, q80 = 0,8446 enerji) kullan─▒l─▒r.',
+      '├çevrimd─▒┼ş─▒ Deney Hatt─▒ (tahmin.py, modeller.py): HistGradientBoostingRegressor ve GradientBoostingRegressor modelleri 5.315 do─şrulama oturumu ve 68 s─▒k─▒┼ş─▒k g├╝ndeki 5.207 sim├╝lasyon oturumu (fark: 108 oturum) ├╝zerinde test edilmi┼ştir.',
+    ],
+  },
+];
 
 export default function MethodologyView() {
   return (
-    <div className="space-y-6">
-      {/* Introduction */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl">
-        <div className="flex items-center space-x-3 mb-3">
-          <BookOpen className="w-5 h-5 text-emerald-400 shrink-0" />
-          <h2 className="text-base sm:text-lg font-bold text-white">
-            ŞarjDenge AI — Bilimsel Metodoloji, Terimler ve Hipotez Sözlüğü
-          </h2>
-        </div>
-        <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-          Bu karar destek sistemi, Climathon 2026 kapsamında otoparklardaki dinamik trafo ve şarj gücü kapasite kısıtları altında elektrikli araç şarjını yönetmek amacıyla geliştirilmiştir. Aşağıdaki kılavuz; jüri heyetinin model çıktılarını, hipotez testlerini ve fiziksel simülasyon dinamiklerini tam bir bilimsel şeffaflıkla değerlendirmesini sağlar.
-        </p>
-      </div>
-
-      {/* Grid of Key Concepts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Concept 1: Yüzde vs Yüzde Puanı */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-          <div className="flex items-center space-x-2 text-emerald-400 font-bold text-xs sm:text-sm mb-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
-            <span>Yüzde (%) ile Yüzde Puanı (y.p.) Ayrımı</span>
+    <div className="space-y-4">
+      {/* Compact Header */}
+      <div className="bg-white border border-slate-200/90 rounded-xl p-4 sm:p-5 shadow-2xs">
+        <div className="flex items-center space-x-2.5">
+          <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0">
+            <BookOpen className="w-4 h-4" />
           </div>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            Metriklerimizin karşılaştırılmasında oransal değişim ile mutlak fark kesin olarak ayrılmıştır:
-          </p>
-          <ul className="mt-2.5 space-y-1.5 text-xs text-slate-400">
-            <li>• <strong className="text-slate-200">Yüzde Puanı (y.p. / p.p.):</strong> İki başarı oranı arasındaki doğrudan aritmetik farktır. Örneğin %90 başarıdan %92 başarıya çıkış tam olarak <span className="text-emerald-400 font-mono font-semibold">+2,00 y.p.</span> mutlak artıştır.</li>
-            <li>• <strong className="text-slate-200">Göreceli Değişim (%):</strong> Oranın kendi üzerindeki büyüme yüzdesidir (%90'dan %92'ye çıkış göreceli %2,22 büyümedir).</li>
-            <li>• <strong className="text-slate-200">Ön Kayıt Kuralı:</strong> Hipotez eşiğimiz mutlak <code className="text-amber-300 bg-slate-950 px-1.5 py-0.5 rounded border border-amber-500/20 font-mono text-[11px]">Δ ≥ +2,00 y.p.</code> olarak tanımlanmıştır.</li>
-          </ul>
-        </div>
-
-        {/* Concept 2: Hayalet Kapasite Rezervasyonu */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-          <div className="flex items-center space-x-2 text-rose-400 font-bold text-xs sm:text-sm mb-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>Hayalet Kapasite Rezervasyonu (Çalışma Hipotezi)</span>
+          <div>
+            <h2 className="text-base font-bold text-slate-900">
+              Metodoloji & Terimler S├Âzl├╝─ş├╝
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Model ├ğ─▒kt─▒lar─▒, hipotez testleri ve sim├╝lasyon kavramlar─▒n─▒n ├Âzet referans k─▒lavuzu
+            </p>
           </div>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            Tahmin destekli güvenli MPC'nin ana hipotezde geride kalmasının fiziksel temelidir:
-          </p>
-          <p className="mt-2 text-xs text-slate-400 leading-relaxed">
-            Model, erken ayrılma riskine karşı süreyi konservatif biçimde kısa (<code className="text-slate-200 bg-slate-950 px-1 py-0.5 rounded">q20 süre</code>) ve enerjiyi yüksek (<code className="text-slate-200 bg-slate-950 px-1 py-0.5 rounded">q80 enerji</code>) tahmin etmiştir. MPC optimizasyon çözücüsü, bu varsayılan gelecekteki yoğun şarjı garanti etmek için mevcut adımlarda ayrılabilir kapasiteyi kilitler. Ancak araçlar çoğunlukla tahmin edilenden daha uzun süre kaldığı veya daha az enerjiye ihtiyaç duyduğu için rezerve edilen kapasite kullanılmaz; o esnada otoparkta bekleyen diğer araçlar gereksiz yere güçsüz bırakılır.
-          </p>
-        </div>
-
-        {/* Concept 3: Neden EDF Algoritması Kazandı? */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-          <div className="flex items-center space-x-2 text-sky-400 font-bold text-xs sm:text-sm mb-2">
-            <Cpu className="w-4 h-4 shrink-0" />
-            <span>Neden En Erken Termin (EDF) Algoritması Üstündür?</span>
-          </div>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            EDF (Earliest Deadline First), şebeke kapasitesini paylaştırırken hiçbir araca gelecekteki adımlar için hayali kapasite saklamaz:
-          </p>
-          <ul className="mt-2.5 space-y-1.5 text-xs text-slate-400">
-            <li>• Her 15 dakikalık adımda prize bağlı araçları ayrılış terminine göre sıralar.</li>
-            <li>• Ayrılışı en yakın araca azami gücü anında verir, artan gücü sıradaki araca devreder.</li>
-            <li>• Kapasiteyi anlık olarak %100 kullandığı için erken ayrılan sürücülerde <strong className="text-emerald-300">79,0%–89,0% başarı</strong> ve p10 adillikte <strong className="text-emerald-300">94,0%–98,0% oranına</strong> ulaşmıştır.</li>
-          </ul>
-        </div>
-
-        {/* Concept 4: Veri Ayrımı ve Sentetik vs Saha */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-          <div className="flex items-center space-x-2 text-purple-400 font-bold text-xs sm:text-sm mb-2">
-            <ShieldCheck className="w-4 h-4 shrink-0" />
-            <span>Gerçek Saha Verisi vs Sentetik Model Ayrımı</span>
-          </div>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            Projede veri kaynakları kesin bir etik kuralla birbirinden ayrılmıştır:
-          </p>
-          <ul className="mt-2.5 space-y-1.5 text-xs text-slate-400">
-            <li>• <strong className="text-emerald-400">Gerçek Saha Verisi:</strong> Caltech ve JPL sahalarındaki ACN-Data 2019 ölçümleridir. 68 gün ve 5.207 oturumdan oluşur.</li>
-            <li>• <strong className="text-amber-400">Sentetik Konut/İşyeri Modeli:</strong> Türkiye apartman otoparklarında henüz açık saha telemetrisi bulunmadığı için EPDK mevzuatı, Togg T10X katalogları ve şehir içi sürüş istatistikleriyle kurgulanmış parametrik simülasyondur. Kesinlikle gerçek ölçüm gibi sunulmaz.</li>
-          </ul>
         </div>
       </div>
 
-      {/* Excluded Sessions Reconciliation Card */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
-        <div className="flex items-center space-x-2 mb-2 text-white font-bold text-xs sm:text-sm">
-          <GitCommit className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>Örneklem Açıklaması: 5.315 Doğrulama Oturumu vs 5.207 Simülasyon Oturumu</span>
-        </div>
-        <p className="text-xs text-slate-300 leading-relaxed">
-          İş Paketi C'de ML modelleri toplam <strong>5.315 oturum</strong> üzerinde doğrulanmıştır. İş Paketi D'deki simülasyonda ise toplam <strong>5.207 oturum</strong> yer almaktadır.
-        </p>
-        <div className="mt-2.5 p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs text-slate-300 font-mono">
-          5.315 (Toplam Doğrulama) - 5.207 (Simülasyon Oturumu) = 108 Dışlanan Seyrek Oturum
-        </div>
-        <p className="text-xs text-slate-400 mt-2.5 leading-relaxed">
-          <strong className="text-slate-300">Dışlama Sebebi:</strong> Deney koşucusu (<code className="text-slate-300 bg-slate-950 px-1 py-0.5 rounded">deney_v2.py</code>), günlük aktif araç sayısı 8'den az olan seyrek günleri (<code className="text-slate-300 bg-slate-950 px-1 py-0.5 rounded">min_arac_gunluk=8</code>) elemiştir. Bir günde sadece 2-3 araç bağlandığında şarj gücü tavanına asla yaklaşılmadığı için sıkışıklık oluşmaz ve algoritmaların performans farkı ölçülemez.
-        </p>
+      {/* Concept Cards: Title + 1-2 Sentence Summary + Expandable Details */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+        {CONCEPTS.map((item) => {
+          const IconComponent = item.icon;
+          return (
+            <div
+              key={item.id}
+              className={`bg-white border border-slate-200/90 rounded-xl p-4 shadow-2xs flex flex-col justify-between ${
+                item.id === 'live-vs-offline' ? 'md:col-span-2' : ''
+              }`}
+            >
+              <div>
+                <div className="flex items-center space-x-2 text-slate-900 font-bold text-sm mb-1.5">
+                  <IconComponent className={`w-4 h-4 shrink-0 ${item.iconColor}`} />
+                  <span>{item.title}</span>
+                </div>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  {item.summary}
+                </p>
+              </div>
+
+              <details className="mt-3 pt-2.5 border-t border-slate-100 group text-xs text-slate-600">
+                <summary className="font-semibold text-emerald-800 hover:text-emerald-900 cursor-pointer flex items-center justify-between list-none">
+                  <span>Ayr─▒nt─▒l─▒ A├ğ─▒klama</span>
+                  <span className="text-slate-400 group-open:rotate-180 transition-transform">Ôû¥</span>
+                </summary>
+                <ul className="mt-2 space-y-1.5 text-slate-600 leading-relaxed list-disc pl-4">
+                  {item.details.map((line, idx) => (
+                    <li key={idx}>{line}</li>
+                  ))}
+                </ul>
+              </details>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

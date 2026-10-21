@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Activity, Eye, EyeOff } from 'lucide-react';
+﻿import React, { useState } from 'react';
+import { Activity } from 'lucide-react';
 import { formatKw } from '../utils/formatters.js';
+import { ALGORITHM_META } from '../utils/algorithmMeta.js';
 
 export default function PowerCurveChart({ simulation }) {
   if (!simulation || !simulation.zaman_etiketleri) return null;
@@ -19,12 +20,12 @@ export default function PowerCurveChart({ simulation }) {
   const [hoveredIdx, setHoveredIdx] = useState(null);
 
   const seriesMeta = [
-    { key: 'fcfs_beyan', name: 'FCFS (Beyan)', color: '#EF4444' },
-    { key: 'edf_beyan', name: 'EDF (Beyan)', color: '#3B82F6' },
-    { key: 'edf_tahmin_guvenli', name: 'EDF Güvenli', color: '#8B5CF6' },
-    { key: 'mpc_beyan', name: 'MPC (Beyan)', color: '#F59E0B' },
-    { key: 'mpc_tahmin_guvenli', name: 'MPC Güvenli (Hipotez)', color: '#10B981' },
-    { key: 'mpc_hibrit_asimetrik', name: 'MPC Hibrit', color: '#06B6D4' },
+    ALGORITHM_META.fcfs_beyan,
+    ALGORITHM_META.edf_beyan,
+    ALGORITHM_META.edf_tahmin_guvenli,
+    ALGORITHM_META.mpc_beyan,
+    ALGORITHM_META.mpc_tahmin_guvenli,
+    ALGORITHM_META.mpc_hibrit_asimetrik,
   ];
 
   const timeLabels = simulation.zaman_etiketleri; // 96 steps
@@ -41,8 +42,8 @@ export default function PowerCurveChart({ simulation }) {
 
   // Chart dimensions
   const svgWidth = 960;
-  const svgHeight = 280;
-  const padding = { top: 20, right: 30, bottom: 35, left: 55 };
+  const svgHeight = 300;
+  const padding = { top: 24, right: 32, bottom: 40, left: 64 };
   const graphWidth = svgWidth - padding.left - padding.right;
   const graphHeight = svgHeight - padding.top - padding.bottom;
 
@@ -63,61 +64,80 @@ export default function PowerCurveChart({ simulation }) {
   const activeHover = hoveredIdx !== null ? {
     time: timeLabels[hoveredIdx],
     unctrl: unctrl[hoveredIdx],
-    series: seriesMeta.map(s => ({
+    series: seriesMeta.map((s) => ({
       ...s,
       val: (simulation.yontem_profilleri[s.key] || [])[hoveredIdx] || 0,
     })),
   } : null;
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 mb-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-        <div>
-          <div className="flex items-center space-x-2">
-            <Activity className="w-4 h-4 text-emerald-400" />
-            <h3 className="font-bold text-xs sm:text-sm text-white">24 Saatlik Güç-Zaman Yük Eğrisi (96 Adım / 15 dk)</h3>
-          </div>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Ayrılabilir şarj gücü tavanı (<span className="text-rose-400 font-semibold">{formatKw(capLimit)}</span>) ve kontrolsüz pik karşısında algoritmaların yük profilleri.
-          </p>
+    <section className="bg-white border border-slate-200/90 rounded-xl p-4 sm:p-5 mb-4 shadow-2xs" aria-label="24 Saatlik G├╝├ğ E─şrisi">
+      {/* Compact Header & Legend */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 mb-2.5">
+        <div className="flex items-center space-x-2">
+          <Activity className="w-4 h-4 text-emerald-700 shrink-0" />
+          <h3 className="font-semibold text-sm sm:text-base text-slate-900">
+            24 Saatlik G├╝├ğ E─şrisi
+          </h3>
+          <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-50 text-rose-800 border border-rose-200/80 tabular-nums">
+            Tavan: {formatKw(capLimit)}
+          </span>
         </div>
 
-        {/* Legend / Toggles */}
+        {/* Compact Legend Toggles */}
         <div className="flex items-center flex-wrap gap-1.5 text-[11px]">
-          {seriesMeta.map((s) => (
-            <button
-              key={s.key}
-              onClick={() => toggleSeries(s.key)}
-              className={`flex items-center space-x-1.5 px-2 py-1 rounded-md border transition ${
-                visibleSeries[s.key]
-                  ? 'bg-slate-800 border-slate-700 text-slate-200'
-                  : 'bg-slate-950/40 border-slate-800/80 text-slate-600 line-through'
-              }`}
-            >
-              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: s.color }} />
-              <span>{s.name}</span>
-            </button>
-          ))}
+          {seriesMeta.map((s) => {
+            const isVis = visibleSeries[s.key];
+            return (
+              <button
+                key={s.key}
+                type="button"
+                onClick={() => toggleSeries(s.key)}
+                aria-pressed={isVis}
+                className={`flex items-center space-x-1.5 px-2 py-0.5 rounded-md border transition whitespace-nowrap ${
+                  isVis
+                    ? 'bg-white border-slate-200/90 text-slate-800 font-medium shadow-2xs'
+                    : 'bg-slate-50 border-slate-200/60 text-slate-400 line-through'
+                }`}
+              >
+                <svg className="w-3 h-2 shrink-0" viewBox="0 0 16 8" aria-hidden="true">
+                  <line
+                    x1="0"
+                    y1="4"
+                    x2="16"
+                    y2="4"
+                    stroke={s.color}
+                    strokeWidth="2.5"
+                    strokeDasharray={s.dashArray === 'none' ? undefined : s.dashArray}
+                  />
+                </svg>
+                <span>{s.shortName}</span>
+              </button>
+            );
+          })}
           <button
+            type="button"
             onClick={() => toggleSeries('kontrolsuz')}
-            className={`flex items-center space-x-1 px-2 py-1 rounded-md border transition ${
+            aria-pressed={visibleSeries.kontrolsuz}
+            className={`flex items-center space-x-1.5 px-2 py-0.5 rounded-md border transition whitespace-nowrap ${
               visibleSeries.kontrolsuz
-                ? 'bg-slate-800 border-slate-700 text-slate-400'
-                : 'bg-slate-950/40 border-slate-800 text-slate-600 line-through'
+                ? 'bg-white border-slate-200/90 text-slate-700 font-medium shadow-2xs'
+                : 'bg-slate-50 border-slate-200/60 text-slate-400 line-through'
             }`}
           >
-            <span className="w-2.5 h-0.5 bg-slate-400" />
-            <span>Kontrolsüz</span>
+            <svg className="w-3 h-2 shrink-0" viewBox="0 0 16 8" aria-hidden="true">
+              <line x1="0" y1="4" x2="16" y2="4" stroke="#64748b" strokeWidth="2" strokeDasharray="3 3" />
+            </svg>
+            <span>Kontrols├╝z</span>
           </button>
         </div>
       </div>
 
       {/* SVG Interactive Chart */}
-      <div className="relative overflow-x-auto">
+      <div className="relative overflow-x-auto pb-1">
         <svg
           viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-          className="w-full h-auto min-w-[700px] select-none"
+          className="w-full h-auto min-w-[680px] select-none"
           onMouseLeave={() => setHoveredIdx(null)}
           onMouseMove={(e) => {
             const rect = e.currentTarget.getBoundingClientRect();
@@ -138,16 +158,16 @@ export default function PowerCurveChart({ simulation }) {
                   y1={y}
                   x2={padding.left + graphWidth}
                   y2={y}
-                  stroke="#1e293b"
+                  stroke="#e2e8f0"
                   strokeDasharray="4 4"
                 />
                 <text
                   x={padding.left - 10}
                   y={y + 4}
-                  fill="#64748b"
-                  fontSize="10"
+                  fill="#334155"
+                  fontSize="12"
+                  fontWeight="500"
                   textAnchor="end"
-                  fontFamily="monospace"
                 >
                   {val.toFixed(0)} kW
                 </text>
@@ -167,16 +187,16 @@ export default function PowerCurveChart({ simulation }) {
                   y1={padding.top}
                   x2={x}
                   y2={padding.top + graphHeight}
-                  stroke="#1e293b"
-                  strokeWidth="0.8"
+                  stroke="#f1f5f9"
+                  strokeWidth="1"
                 />
                 <text
                   x={x}
-                  y={padding.top + graphHeight + 18}
-                  fill="#64748b"
-                  fontSize="10"
+                  y={padding.top + graphHeight + 22}
+                  fill="#334155"
+                  fontSize="12"
+                  fontWeight="500"
                   textAnchor="middle"
-                  fontFamily="monospace"
                 >
                   {label}
                 </text>
@@ -184,37 +204,36 @@ export default function PowerCurveChart({ simulation }) {
             );
           })}
 
-          {/* Uncontrolled Profile (Dotted Gray) */}
+          {/* Uncontrolled Profile (Dotted Slate) */}
           {visibleSeries.kontrolsuz && unctrl.length > 0 && (
             <path
               d={makePath(unctrl)}
               fill="none"
               stroke="#64748b"
-              strokeWidth="1.5"
+              strokeWidth="1.8"
               strokeDasharray="3 3"
-              opacity="0.8"
+              opacity="0.85"
             />
           )}
 
-          {/* Algorithm Power Curves */}
+          {/* Algorithm Power Curves (Color + Distinct Dash Pattern) */}
           {seriesMeta.map((s) => {
             if (!visibleSeries[s.key]) return null;
-            const data = simulation.yontem_profilleri[s.key] || [];
+            const prof = simulation.yontem_profilleri[s.key] || [];
             return (
               <path
                 key={s.key}
-                d={makePath(data)}
+                d={makePath(prof)}
                 fill="none"
                 stroke={s.color}
-                strokeWidth={s.key === 'mpc_tahmin_guvenli' || s.key === 'edf_tahmin_guvenli' ? '2.5' : '1.8'}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                opacity={hoveredIdx !== null ? 0.95 : 0.85}
+                strokeWidth={s.strokeWidth}
+                strokeDasharray={s.dashArray === 'none' ? undefined : s.dashArray}
+                opacity={s.key === 'mpc_tahmin_guvenli' ? 1.0 : 0.9}
               />
             );
           })}
 
-          {/* Allocatable Charging Power Ceiling Line (Dashed Red) */}
+          {/* Capacity Limit Line (Dashed Rose) */}
           {visibleSeries.kapasite && (
             <g>
               <line
@@ -222,66 +241,79 @@ export default function PowerCurveChart({ simulation }) {
                 y1={getY(capLimit)}
                 x2={padding.left + graphWidth}
                 y2={getY(capLimit)}
-                stroke="#F43F5E"
-                strokeWidth="2"
+                stroke="#be123c"
+                strokeWidth="2.2"
                 strokeDasharray="6 4"
               />
+              <rect
+                x={padding.left + graphWidth - 132}
+                y={Math.max(4, getY(capLimit) - 24)}
+                width="126"
+                height="20"
+                rx="4"
+                fill="#fff1f2"
+                stroke="#fecdd3"
+              />
               <text
-                x={padding.left + graphWidth - 5}
-                y={getY(capLimit) - 6}
-                fill="#F43F5E"
-                fontSize="10"
+                x={padding.left + graphWidth - 12}
+                y={Math.max(18, getY(capLimit) - 10)}
+                fill="#be123c"
+                fontSize="12"
                 fontWeight="bold"
                 textAnchor="end"
               >
-                Şarj Gücü Tavanı ({formatKw(capLimit)})
+                Tavan: {capLimit.toFixed(1).replace('.', ',')} kW
               </text>
             </g>
           )}
 
-          {/* Hover Vertical Guide */}
+          {/* Hover Cursor Vertical Line */}
           {hoveredIdx !== null && (
             <line
               x1={getX(hoveredIdx)}
               y1={padding.top}
               x2={getX(hoveredIdx)}
               y2={padding.top + graphHeight}
-              stroke="#e2e8f0"
+              stroke="#0f172a"
               strokeWidth="1"
               strokeDasharray="2 2"
             />
           )}
         </svg>
 
-        {/* Hover Tooltip Overlay */}
+        {/* Hover Tooltip Box */}
         {activeHover && (
           <div
-            className="absolute top-3 bg-slate-950/95 border border-slate-700/80 rounded-xl p-3 shadow-2xl pointer-events-none text-xs backdrop-blur z-20"
-            style={{
-              left: `${Math.min(75, Math.max(10, (hoveredIdx / 95) * 100))}%`,
-              transform: 'translateX(-50%)',
-            }}
+            className="absolute top-2 right-4 bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-xl p-3 shadow-lg text-xs pointer-events-none transition-all z-10 tabular-nums"
+            style={{ minWidth: '230px' }}
           >
-            <div className="font-bold text-white mb-1.5 flex items-center justify-between border-b border-slate-800 pb-1 font-mono">
-              <span>Saat: {activeHover.time}</span>
-              <span className="text-rose-400 text-[10px]">Tavan: {formatKw(capLimit)}</span>
+            <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-100">
+              <span className="font-bold text-slate-900">Saat: {activeHover.time}</span>
+              <span className="text-xs text-slate-500">15 dk Ad─▒m</span>
             </div>
-            <div className="space-y-1 font-mono">
-              {activeHover.series
-                .filter((s) => visibleSeries[s.key])
-                .map((s) => (
-                  <div key={s.key} className="flex items-center justify-between space-x-3 text-[11px]">
-                    <span className="flex items-center space-x-1.5 text-slate-300">
-                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: s.color }} />
-                      <span>{s.name}:</span>
+
+            <div className="space-y-1">
+              <div className="flex items-center justify-between text-slate-600">
+                <span>Kontrols├╝z Pik:</span>
+                <span className="font-semibold text-slate-900">{formatKw(activeHover.unctrl)}</span>
+              </div>
+
+              {activeHover.series.map((s) => {
+                if (!visibleSeries[s.key]) return null;
+                return (
+                  <div key={s.key} className="flex items-center justify-between gap-2">
+                    <span className="flex items-center space-x-1.5 font-medium" style={{ color: s.color }}>
+                      <span aria-hidden="true">{s.symbol}</span>
+                      <span>{s.shortName}:</span>
                     </span>
-                    <span className="font-bold text-white">{formatKw(s.val, 2)}</span>
+                    <span className="font-bold text-slate-900">{formatKw(s.val)}</span>
                   </div>
-                ))}
+                );
+              })}
             </div>
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 }
