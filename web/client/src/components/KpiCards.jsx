@@ -1,124 +1,203 @@
-import React from 'react';
-import { Award, CheckCircle2, AlertCircle, Zap } from 'lucide-react';
-import { formatPercent, formatKw } from '../utils/formatters.js';
+﻿import React from 'react';
+import { formatPercent, formatKwh, formatKw } from '../utils/formatters.js';
+import { ALGORITHM_META } from '../utils/algorithmMeta.js';
 
 export default function KpiCards({ kpis, simulation }) {
   if (!kpis) return null;
 
-  const methods = [
-    { key: 'fcfs_beyan', name: 'FCFS (Beyan)', color: '#EF4444', desc: 'İlk gelen ilk şarj olur' },
-    { key: 'edf_beyan', name: 'EDF (Beyan)', color: '#3B82F6', desc: 'Beyan çıkışına göre termin' },
-    { key: 'edf_tahmin_guvenli', name: 'EDF Güvenli (Tahmin)', color: '#8B5CF6', desc: 'q20 süre tahminli termin', highlight: true },
-    { key: 'mpc_beyan', name: 'MPC (Beyan)', color: '#F59E0B', desc: 'Doğrusal programlama optimizasyonu' },
-    { key: 'mpc_tahmin_guvenli', name: 'MPC Güvenli (Ana Hipotez)', color: '#10B981', desc: 'q80 enerji / q20 süre kısıtlı', isHypothesis: true },
-    { key: 'mpc_hibrit_asimetrik', name: 'MPC Hibrit (Keşifsel)', color: '#06B6D4', desc: 'Asimetrik hata toleranslı' },
+  const methodKeys = [
+    'fcfs_beyan',
+    'edf_beyan',
+    'edf_tahmin_guvenli',
+    'mpc_beyan',
+    'mpc_tahmin_guvenli',
+    'mpc_hibrit_asimetrik',
   ];
 
-  // Best method calculation for Hedef Karşılama
-  let bestKey = '';
+  const methods = methodKeys.map((k) => ALGORITHM_META[k]).filter(Boolean);
+
+  // Mevcut sim├╝lasyon sonu├ğlar─▒ndan en y├╝ksek hedef kar┼ş─▒lama oran─▒n─▒ belirle
   let bestRate = -1;
-  methods.forEach(m => {
-    const rate = kpis[m.key]?.basari_orani_yuzde ?? -1;
+  methods.forEach((m) => {
+    const rate = Number(kpis[m.key]?.basari_orani_yuzde ?? -1);
     if (rate > bestRate) {
       bestRate = rate;
-      bestKey = m.key;
     }
   });
 
-  const capKw = simulation?.kapasite_siniri_kw;
+  const bestMethods = methods.filter(
+    (m) => Math.abs(Number(kpis[m.key]?.basari_orani_yuzde ?? -1) - bestRate) < 1e-4
+  );
+  const isTiedBest = bestMethods.length > 1;
+  const primaryMethod = bestMethods[0] || methods[0];
+  const primaryKpi = kpis[primaryMethod?.key] || {};
+
+  const earlyVehiclesCount = Array.isArray(simulation?.araclar)
+    ? simulation.araclar.filter((v) => v.erken_ayrildi).length
+    : null;
 
   return (
-    <div className="mb-6 space-y-3">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xs font-bold tracking-wider text-slate-300 uppercase">
-            2. Algoritma Karşılaştırmalı Performans Göstergeleri (KPI)
-          </h2>
-          <p className="text-xs text-slate-400">
-            Tüm yöntemler aynı oturumlar, aynı araç batarya gereksinimleri ve aynı şarj gücü tavanı ({formatKw(capKw)}) altında değerlendirilmiştir.
-          </p>
+    <section className="mb-4 space-y-3" aria-label="Temel Performans G├Âstergeleri ve Algoritma Kar┼ş─▒la┼şt─▒rmas─▒">
+      {/* ├£st B├Âl├╝m: 4 Kompakt Temel G├Âsterge */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 tabular-nums">
+        <div className="bg-white border border-slate-200/90 rounded-xl p-3.5 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-medium text-slate-500">Hedef Kar┼ş─▒lama Oran─▒</span>
+            <span className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
+              E┼şik ÔëÑ%95
+            </span>
+          </div>
+          <div className="mt-2 flex items-baseline justify-between gap-2">
+            <span className="text-2xl font-bold text-slate-900 tracking-tight">
+              {formatPercent(primaryKpi.basari_orani_yuzde, 1)}
+            </span>
+            <span className="text-[11px] text-emerald-800 font-medium truncate">
+              {isTiedBest ? `${bestMethods.length} y├Ântem e┼şit` : primaryMethod?.shortName}
+            </span>
+          </div>
+        </div>
+
+        <div className="bg-white border border-slate-200/90 rounded-xl p-3.5 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-medium text-slate-500">Teslim Edilen Enerji</span>
+            {primaryKpi.toplam_teslim_kwh !== undefined && (
+              <span className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
+                {formatKwh(primaryKpi.toplam_teslim_kwh)}
+              </span>
+            )}
+          </div>
+          <div className="mt-2 flex items-baseline justify-between gap-2">
+            <span className="text-2xl font-bold text-slate-900 tracking-tight">
+              {formatPercent(primaryKpi.teslim_orani_yuzde, 1)}
+            </span>
+            <span className="text-[11px] text-slate-500">Toplam talep oran─▒</span>
+          </div>
+        </div>
+
+        <div className="bg-white border border-slate-200/90 rounded-xl p-3.5 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-medium text-slate-500">Erken Ayr─▒lan Ba┼şar─▒s─▒</span>
+            {earlyVehiclesCount !== null && (
+              <span className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-amber-50 text-amber-800">
+                {earlyVehiclesCount} ara├ğ
+              </span>
+            )}
+          </div>
+          <div className="mt-2 flex items-baseline justify-between gap-2">
+            <span className="text-2xl font-bold text-slate-900 tracking-tight">
+              {primaryKpi.erken_ayrilan_basari_yuzde !== null &&
+              primaryKpi.erken_ayrilan_basari_yuzde !== undefined
+                ? formatPercent(primaryKpi.erken_ayrilan_basari_yuzde, 1)
+                : 'ÔÇö'}
+            </span>
+            <span className="text-[11px] text-slate-500">Hedefe ula┼şan</span>
+          </div>
+        </div>
+
+        <div className="bg-white border border-slate-200/90 rounded-xl p-3.5 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-medium text-slate-500">Kapasite ─░hlali</span>
+            <span className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800">
+              G├╝venli
+            </span>
+          </div>
+          <div className="mt-2 flex items-baseline justify-between gap-2">
+            <span className="text-2xl font-bold text-emerald-800 tracking-tight">
+              {formatKw(primaryKpi.kapasite_ihlali_kw ?? 0)}
+            </span>
+            <span className="text-[11px] text-slate-500">T├╝m y├Ântemler</span>
+          </div>
         </div>
       </div>
 
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
-        {methods.map((m) => {
-          const kpi = kpis[m.key];
-          if (!kpi) return null;
+      {/* Alt B├Âl├╝m: Kompakt 6 Algoritma Kar┼ş─▒la┼şt─▒rma Tablosu */}
+      <div className="bg-white border border-slate-200/90 rounded-xl shadow-2xs overflow-hidden">
+        <div className="px-4 py-2.5 border-b border-slate-100 flex items-center justify-between">
+          <h3 className="text-xs font-semibold text-slate-800">
+            Algoritma Kar┼ş─▒la┼şt─▒rmas─▒
+          </h3>
+          <span className="text-[11px] text-slate-500">
+            Hedef kar┼ş─▒lama e┼şi─şi: ÔëÑ%95
+          </span>
+        </div>
 
-          const isBest = m.key === bestKey;
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs tabular-nums">
+            <thead>
+              <tr className="border-b border-slate-200/80 text-slate-500 bg-slate-50/70 font-medium">
+                <th className="py-2 px-4">Algoritma</th>
+                <th className="py-2 px-4 text-right whitespace-nowrap">Hedef Kar┼ş─▒lama</th>
+                <th className="py-2 px-4 text-right whitespace-nowrap">Teslim Enerjisi</th>
+                <th className="py-2 px-4 text-right whitespace-nowrap">Erken Ayr─▒lan</th>
+                <th className="py-2 px-4 text-right whitespace-nowrap">p10 Adillik</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {methods.map((m) => {
+                const kpi = kpis[m.key];
+                if (!kpi) return null;
 
-          return (
-            <div
-              key={m.key}
-              className={`rounded-2xl p-3.5 border relative transition-all ${
-                isBest
-                  ? 'bg-slate-900 border-emerald-500/80 shadow-md shadow-emerald-500/10 ring-1 ring-emerald-500/40'
-                  : 'bg-slate-900/70 border-slate-800 hover:border-slate-700/80'
-              }`}
-            >
-              {/* Badge for Hypothesis / Best */}
-              <div className="flex items-center justify-between mb-2">
-                <span
-                  className="w-2.5 h-2.5 rounded-full"
-                  style={{ backgroundColor: m.color }}
-                />
-                {isBest && (
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center space-x-1">
-                    <Award className="w-3 h-3" />
-                    <span>Lider</span>
-                  </span>
-                )}
-                {m.isHypothesis && !isBest && (
-                  <span className="text-[9px] font-medium px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                    Ana Hipotez
-                  </span>
-                )}
-              </div>
+                const isBest =
+                  Math.abs(Number(kpi.basari_orani_yuzde ?? -1) - bestRate) < 1e-4;
 
-              {/* Title */}
-              <h3 className="font-bold text-xs text-white truncate" title={m.name}>
-                {m.name}
-              </h3>
+                return (
+                  <tr
+                    key={m.key}
+                    className={`hover:bg-slate-50/80 transition ${
+                      isBest ? 'bg-emerald-50/20' : ''
+                    }`}
+                  >
+                    <td className="py-2.5 px-4 font-medium text-slate-900 whitespace-nowrap">
+                      <div className="flex items-center space-x-2">
+                        <span
+                          className="w-2.5 h-2.5 rounded-full shrink-0"
+                          style={{ backgroundColor: m.color }}
+                        />
+                        <span>{m.name}</span>
 
-              {/* Primary Metric: Hedef Karşılama Oranı */}
-              <div className="mt-2.5 mb-2">
-                <span className="text-[10px] text-slate-400 block uppercase font-medium">Hedef Karşılama (≥%95)</span>
-                <div className="flex items-baseline space-x-1 mt-0.5">
-                  <span className="text-xl font-extrabold text-white font-mono">
-                    {formatPercent(kpi.basari_orani_yuzde, 1)}
-                  </span>
-                </div>
-              </div>
+                        {isBest && (
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200/80 leading-none">
+                            {isTiedBest ? 'E┼şit En Y├╝ksek' : 'En Y├╝ksek'}
+                          </span>
+                        )}
+                        {m.isHypothesis && (
+                          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 leading-none">
+                            Hipotez
+                          </span>
+                        )}
+                        {m.key === 'mpc_hibrit_asimetrik' && (
+                          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 leading-none">
+                            Ke┼şifsel
+                          </span>
+                        )}
+                      </div>
+                    </td>
 
-              {/* Secondary Metrics */}
-              <div className="space-y-1.5 pt-2 border-t border-slate-800/80 text-[11px]">
-                <div className="flex items-center justify-between text-slate-400">
-                  <span>Teslim Enerji:</span>
-                  <span className="font-mono text-slate-200">{formatPercent(kpi.teslim_orani_yuzde, 1)}</span>
-                </div>
+                    <td className="py-2.5 px-4 text-right font-bold text-slate-900 whitespace-nowrap">
+                      {formatPercent(kpi.basari_orani_yuzde, 1)}
+                    </td>
 
-                <div className="flex items-center justify-between text-slate-400">
-                  <span>Erken Ayrılan:</span>
-                  <span className="font-mono text-slate-200">
-                    {kpi.erken_ayrilan_basari_yuzde !== null ? formatPercent(kpi.erken_ayrilan_basari_yuzde, 1) : '—'}
-                  </span>
-                </div>
+                    <td className="py-2.5 px-4 text-right text-slate-700 whitespace-nowrap">
+                      {formatPercent(kpi.teslim_orani_yuzde, 1)}
+                    </td>
 
-                <div className="flex items-center justify-between text-slate-400">
-                  <span>p10 Adillik:</span>
-                  <span className="font-mono text-slate-200">{formatPercent(kpi.p10_adillik_yuzde, 1)}</span>
-                </div>
+                    <td className="py-2.5 px-4 text-right text-slate-700 whitespace-nowrap">
+                      {kpi.erken_ayrilan_basari_yuzde !== null &&
+                      kpi.erken_ayrilan_basari_yuzde !== undefined
+                        ? formatPercent(kpi.erken_ayrilan_basari_yuzde, 1)
+                        : 'ÔÇö'}
+                    </td>
 
-                <div className="flex items-center justify-between text-slate-400">
-                  <span>Kapasite İhlali:</span>
-                  <span className="font-mono text-emerald-400 font-bold">0,0 kW</span>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+                    <td className="py-2.5 px-4 text-right text-slate-700 whitespace-nowrap">
+                      {formatPercent(kpi.p10_adillik_yuzde, 1)}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
