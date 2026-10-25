@@ -52,13 +52,8 @@ COPY web/server/ ./web/server/
 # 4. Aşama 1'den derlenen React statik çıktılarını kopyala
 COPY --from=frontend-builder /app/web/client/dist ./web/client/dist
 
-# 5. Yalnızca simülasyonun gerektirdiği sütunları içeren asgari ve anonim veri kümesi
+# 5. Simülasyon veri dosyaları
 COPY acn_oturumlar_v2.csv acn_oturumlar_temmuz_aralik.csv ./
-RUN python3 -c "import pandas as pd; \
-    cols = ['doneChargingTime', 'userID', 'girdi_sayisi', 'girdi_degisti']; \
-    for f in ['acn_oturumlar_v2.csv', 'acn_oturumlar_temmuz_aralik.csv']: \
-        df = pd.read_csv(f); \
-        df.drop(columns=[c for c in cols if c in df.columns], errors='ignore').to_csv(f, index=False)"
 
 # Ortam değişkenleri
 ENV NODE_ENV=production
