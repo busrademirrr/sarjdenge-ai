@@ -3,6 +3,7 @@ import { spawn, spawnSync } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { SCENARIOS } from './scenarios.js';
+import { pythonProcessQueue } from '../utils/processQueue.js';
 
 const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -37,6 +38,14 @@ function resolvePythonExecutable() {
 
 router.post('/', async (req, res) => {
   const { scenarioId = 'isyeri_gunduz', day, seed = 42, multiDay = false } = req.body || {};
+
+  // 1. Çok günlü mod üretim/dağıtım ortamında kapalıysa doğrudan reddet
+  if (multiDay && process.env.ENABLE_MULTIDAY !== 'true') {
+    return res.status(400).json({
+      success: false,
+      error: 'Çok günlü mod bu ortamda bellek ve süre sınırları nedeniyle devre dışı bırakılmıştır.',
+    });
+  }
 
   if (!VALID_SCENARIO_IDS.has(String(scenarioId))) {
     return res.status(400).json({
@@ -75,6 +84,26 @@ router.post('/', async (req, res) => {
     pythonArgs.push('--gun', String(day).trim());
   }
 
+  // 2. Bellek koruması: Eşzamanlı Python sürecini 1 ile sınırla
+  let releaseLock;
+  try {
+    releaseLock = await pythonProcessQueue.acquire();
+  } catch (queueErr) {
+    return res.status(queueErr.status || 503).json({
+      success: false,
+      error: queueErr.message,
+      code: queueErr.code || 'SERVER_BUSY',
+    });
+  }
+
+  let lockReleased = false;
+  const safeRelease = () => {
+    if (!lockReleased && typeof releaseLock === 'function') {
+      lockReleased = true;
+      releaseLock();
+    }
+  };
+
   const pythonExecutable = resolvePythonExecutable();
 
   try {
@@ -97,6 +126,13 @@ router.post('/', async (req, res) => {
       }
     }, timeoutLimit);
 
+    req.on('close', () => {
+      if (!responded && !pyProcess.killed) {
+        pyProcess.kill();
+        safeRelease();
+      }
+    });
+
     pyProcess.stdout.on('data', chunk => {
       stdoutData += chunk.toString('utf-8');
     });
@@ -107,6 +143,7 @@ router.post('/', async (req, res) => {
 
     pyProcess.on('error', err => {
       clearTimeout(timeoutId);
+      safeRelease();
       if (responded) return;
       responded = true;
       if (process.env.NODE_ENV !== 'test') {
@@ -121,6 +158,7 @@ router.post('/', async (req, res) => {
 
     pyProcess.on('close', code => {
       clearTimeout(timeoutId);
+      safeRelease();
       if (responded) return;
       responded = true;
 
@@ -186,6 +224,7 @@ router.post('/', async (req, res) => {
       }
     });
   } catch (err) {
+    safeRelease();
     res.status(500).json({
       success: false,
       error: 'Kapasite Danışmanı süreci başlatılamadı.',

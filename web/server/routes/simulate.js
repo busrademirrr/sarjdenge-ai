@@ -3,6 +3,7 @@ import { spawn, spawnSync } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { SCENARIOS } from './scenarios.js';
+import { pythonProcessQueue } from '../utils/processQueue.js';
 
 const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -94,6 +95,26 @@ router.post('/', async (req, res) => {
     pythonArgs.push('--gun', String(day).trim());
   }
 
+  // Bellek koruması: Eşzamanlı Python sürecini 1 ile sınırla
+  let releaseLock;
+  try {
+    releaseLock = await pythonProcessQueue.acquire();
+  } catch (queueErr) {
+    return res.status(queueErr.status || 503).json({
+      success: false,
+      error: queueErr.message,
+      code: queueErr.code || 'SERVER_BUSY',
+    });
+  }
+
+  let lockReleased = false;
+  const safeRelease = () => {
+    if (!lockReleased && typeof releaseLock === 'function') {
+      lockReleased = true;
+      releaseLock();
+    }
+  };
+
   const pythonExecutable = resolvePythonExecutable();
 
   try {
@@ -114,6 +135,13 @@ router.post('/', async (req, res) => {
       }
     }, 25000);
 
+    req.on('close', () => {
+      if (!responded && !pyProcess.killed) {
+        pyProcess.kill();
+        safeRelease();
+      }
+    });
+
     pyProcess.stdout.on('data', chunk => {
       stdoutData += chunk.toString('utf-8');
     });
@@ -124,6 +152,7 @@ router.post('/', async (req, res) => {
 
     pyProcess.on('error', err => {
       clearTimeout(timeoutId);
+      safeRelease();
       if (responded) return;
       responded = true;
       if (process.env.NODE_ENV !== 'test') {
@@ -138,6 +167,7 @@ router.post('/', async (req, res) => {
 
     pyProcess.on('close', code => {
       clearTimeout(timeoutId);
+      safeRelease();
       if (responded) return;
       responded = true;
 
@@ -203,6 +233,7 @@ router.post('/', async (req, res) => {
       }
     });
   } catch (err) {
+    safeRelease();
     res.status(500).json({
       success: false,
       error: 'Simülasyon süreci başlatılamadı.',

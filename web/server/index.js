@@ -41,6 +41,8 @@ app.use('/api/capacity-advisor', capacityAdvisorRouter);
 app.use('/api/export', exportRouter);
 
 // Health check
+app.get('/healthz', (req, res) => res.status(200).send('OK'));
+app.get('/api/healthz', (req, res) => res.status(200).send('OK'));
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',

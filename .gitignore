@@ -17,15 +17,12 @@ env/
 !.env.example
 !.env.template
 
-# Raw ACN datasets at project root
+# Raw redundant ACN datasets at project root
 /acn_ocak_temmuz.csv
 /acn_oturumlar_ocak_haziran.csv
-/acn_oturumlar_temmuz_aralik.csv
-/acn_oturumlar_v2.csv
 
-# Raw ACN archive and 2020 holdout data
+# Raw ACN archive
 /data/ham/
-/data/holdout_2020_01_02/
 
 # Local logs and editor files
 *.log
@@ -35,15 +32,24 @@ env/
 # Conservative data protection: CSV files excluded by default
 *.csv
 
-# Allow only reviewed aggregate experiment summaries
+# Docker and Web Service required datasets
+!/acn_oturumlar_v2.csv
+!/acn_oturumlar_temmuz_aralik.csv
+
+# Allow reviewed aggregate experiment summaries and holdout results
 !/data/deney_tablo_val.csv
 !/data/deney_boot_val.csv
 !/data/deney_tablo_ta.csv
 !/data/deney_boot_ta.csv
+!/data/deney_tablo_val_duzeltilmis.csv
+!/data/deney_boot_val_duzeltilmis.csv
+!/data/deney_tablo_ta_duzeltilmis.csv
+!/data/deney_boot_ta_duzeltilmis.csv
+!/data/holdout_2020_01_02/
+!/data/holdout_2020_01_02/*.csv
 
 # Generated or unreviewed data artifacts
 /data/sentetik/
 /demo_veri.json
 /grafik.png
 /scratch/
-

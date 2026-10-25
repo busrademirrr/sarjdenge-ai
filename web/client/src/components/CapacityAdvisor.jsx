@@ -9,6 +9,7 @@ export default function CapacityAdvisor({
   day,
   onChangeDay,
 }) {
+  const enableMultiDay = import.meta.env.VITE_ENABLE_MULTIDAY === 'true';
   const [loading, setLoading] = useState(false);
   const [advisorData, setAdvisorData] = useState(null);
   const [error, setError] = useState(null);
@@ -184,7 +185,8 @@ export default function CapacityAdvisor({
               </select>
             )}
 
-            {/* Ayrı Çok Günlü Mod Düğmesi (Varsayılan Kapalı) */}
+            {/* Ayrı Çok Günlü Mod Düğmesi (Varsayılan Kapalı, VITE_ENABLE_MULTIDAY ile kontrol edilir) */}
+            {enableMultiDay && (
             <button
               type="button"
               onClick={() => setIsMultiDay((prev) => !prev)}
@@ -207,6 +209,7 @@ export default function CapacityAdvisor({
                 )}
               </span>
             </button>
+            )}
 
             <button
               onClick={() => runAdvisor(selectedScenarioId, day, isMultiDay)}

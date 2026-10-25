@@ -19,6 +19,13 @@ test.after(async () => {
   });
 });
 
+test('GET /healthz returns 200 OK immediately without calling Python', async () => {
+  const res = await fetch(`${BASE_URL}/healthz`);
+  assert.equal(res.status, 200);
+  const text = await res.text();
+  assert.equal(text, 'OK');
+});
+
 test('GET /api/health returns ok status', async () => {
   const res = await fetch(`${BASE_URL}/api/health`);
   assert.equal(res.status, 200);
@@ -115,25 +122,49 @@ test('POST /api/capacity-advisor returns valid 4-method analysis', { timeout: 25
   assert.ok(yontemKodlari.includes('mpc'));
 });
 
-test('POST /api/capacity-advisor runs multi-day analysis without timing out and returns distributions', { timeout: 90000 }, async () => {
-  const res = await fetch(`${BASE_URL}/api/capacity-advisor`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ scenarioId: 'isyeri_gunduz', day: '2026-03-10', multiDay: true }),
-  });
+test('POST /api/capacity-advisor rejects multi-day when ENABLE_MULTIDAY is not true', async () => {
+  const oldVal = process.env.ENABLE_MULTIDAY;
+  delete process.env.ENABLE_MULTIDAY;
+  try {
+    const res = await fetch(`${BASE_URL}/api/capacity-advisor`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scenarioId: 'isyeri_gunduz', day: '2026-03-10', multiDay: true }),
+    });
 
-  assert.equal(res.status, 200);
-  const data = await res.json();
-  assert.equal(data.success, true);
-  assert.ok(data.advisor);
-  assert.ok(data.advisor.cok_gunlu_analiz);
-  assert.equal(data.advisor.cok_gunlu_analiz.toplam_gun, 20);
-  assert.equal(data.advisor.cok_gunlu_analiz.hedef_gun_sayisi, 20);
-  assert.equal(data.advisor.cok_gunlu_analiz.yontemler.length, 4);
+    assert.equal(res.status, 400);
+    const data = await res.json();
+    assert.equal(data.success, false);
+    assert.ok(data.error.includes('Çok günlü mod'));
+  } finally {
+    if (oldVal !== undefined) process.env.ENABLE_MULTIDAY = oldVal;
+  }
+});
 
-  for (const y of data.advisor.cok_gunlu_analiz.yontemler) {
-    assert.ok(y.medyan_kw !== null);
-    assert.ok(y.orneklem_sayisi > 0);
+test('POST /api/capacity-advisor runs multi-day analysis when ENABLE_MULTIDAY=true', { timeout: 90000 }, async () => {
+  process.env.ENABLE_MULTIDAY = 'true';
+  try {
+    const res = await fetch(`${BASE_URL}/api/capacity-advisor`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scenarioId: 'isyeri_gunduz', day: '2026-03-10', multiDay: true }),
+    });
+
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.ok(data.advisor);
+    assert.ok(data.advisor.cok_gunlu_analiz);
+    assert.equal(data.advisor.cok_gunlu_analiz.toplam_gun, 20);
+    assert.equal(data.advisor.cok_gunlu_analiz.hedef_gun_sayisi, 20);
+    assert.equal(data.advisor.cok_gunlu_analiz.yontemler.length, 4);
+
+    for (const y of data.advisor.cok_gunlu_analiz.yontemler) {
+      assert.ok(y.medyan_kw !== null);
+      assert.ok(y.orneklem_sayisi > 0);
+    }
+  } finally {
+    delete process.env.ENABLE_MULTIDAY;
   }
 });
 
@@ -180,5 +211,3 @@ test('POST /api/simulate rejects invalid parameters and empty date gracefully', 
   assert.equal(emptyDateData.success, false);
   assert.ok(emptyDateData.error);
 });
-
-

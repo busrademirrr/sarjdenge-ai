@@ -15,7 +15,16 @@ scripts
 .env.*
 *.log
 
-# Gereksiz büyük veri ve geçici dosyalar
+# Gereksiz ham / harici / eski veri klasörleri
+data/ham
+data/external
+data/sentetik
+data/deney_tablo_ta.csv
+data/deney_tablo_val.csv
+data/deney_boot_ta.csv
+data/deney_boot_val.csv
+
+# Kök dizindeki gereksiz / geçici veri dosyaları
 gunluk_5gun.csv
 gunluk_sonuclar.csv
 tani_sonuclari.csv
@@ -30,9 +39,8 @@ ONKAYIT_3.md
 PROJE_BAGLAMI.md
 VERI_HAZIRLAMA_KURALLARI.md
 
-# Node bağımlılıkları (imaj içinde temiz kurulacak)
+# Node bağımlılıkları ve eski derlemeler
 node_modules
 web/server/node_modules
 web/client/node_modules
-web/client/src
-web/client/public
+web/client/dist

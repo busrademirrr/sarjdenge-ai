@@ -1,0 +1,4 @@
+f,karsilastirma,fark_yuzde_puan,ci_95_alt_puan,ci_95_ust_puan,n_gun_erken,anlamli_mi
+0.5,edf_tahmin_guvenli - edf_beyan (erken_ok),2.7107955475394063,-0.1274155108270171,5.069932511495597,107,False
+0.7,edf_tahmin_guvenli - edf_beyan (erken_ok),1.414824832402843,-1.1959109801857966,3.3138370202662353,107,False
+0.9,edf_tahmin_guvenli - edf_beyan (erken_ok),1.15493512913261,0.2801471154020933,2.3032668629021735,107,True

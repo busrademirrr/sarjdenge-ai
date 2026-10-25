@@ -1,0 +1,40 @@
+{
+  "egitim_oturum_sayisi": 25421,
+  "test_oturum_sayisi": 4072,
+  "s_sure_egit": 341.85,
+  "s_kwh_egit": 10.96806941799351,
+  "sure_metrikleri": {
+    "mss": 0.11113587854020347,
+    "pinball_ort": 35.05350194537326,
+    "pinball_norm": 0.10254059366790481,
+    "pinball_q20": 32.22355136677687,
+    "pinball_q50": 42.47005356785871,
+    "pinball_q80": 30.466900901484216,
+    "coverage_q20": 0.19990176817288802,
+    "coverage_q80": 0.7915029469548134,
+    "coverage_hatasi": 0.008595284872298659,
+    "mae_q50": 84.94010713571743,
+    "crossing_sayisi": 26,
+    "crossing_orani": 0.0063850687622789785,
+    "ham_pinball_ort": 35.06642720611149,
+    "coverage_q50": 0.49729862475442044
+  },
+  "kwh_metrikleri": {
+    "mss": 0.1599111634739962,
+    "pinball_ort": 1.4010638208311592,
+    "pinball_norm": 0.12774024009482143,
+    "pinball_q20": 1.2163365034671925,
+    "pinball_q50": 1.7389025837400143,
+    "pinball_q80": 1.2479523752862711,
+    "coverage_q20": 0.2082514734774067,
+    "coverage_q80": 0.8239194499017681,
+    "coverage_hatasi": 0.032170923379174765,
+    "mae_q50": 3.4778051674800285,
+    "crossing_sayisi": 98,
+    "crossing_orani": 0.02406679764243615,
+    "ham_pinball_ort": 1.4014168158983733,
+    "coverage_q50": 0.5071218074656189
+  },
+  "mae_beyan_sure": 156.3598231827112,
+  "mae_beyan_kwh": 11.48336692695607
+}
