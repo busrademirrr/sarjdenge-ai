@@ -31,7 +31,7 @@ export default function CapacityAdvisor({
     setError(null);
 
     // Makul istemci bekleme süresi: Çok günlü için 210 sn, örnek gün için 40 sn
-    const clientTimeoutMs = multiDayMode ? 210000 : 40000;
+    const clientTimeoutMs = multiDayMode ? 210000 : 90000;
     let clientTimedOut = false;
     const timeoutId = setTimeout(() => {
       clientTimedOut = true;
