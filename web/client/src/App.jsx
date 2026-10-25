@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Navbar from './components/Navbar.jsx';
 import ScenarioSelector from './components/ScenarioSelector.jsx';
 import CapacityControl from './components/CapacityControl.jsx';
@@ -27,6 +27,8 @@ export default function App() {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const [onlyDifferences, setOnlyDifferences] = useState(true);
+  const activeControllerRef = useRef(null);
+  const initialSimulationFiredRef = useRef(false);
 
   // Güvenli hata mesajı temizleyicisi (Token, header veya ham stack trace sızmasını önler)
   const sanitizeErrorMessage = (msg) => {
@@ -68,6 +70,10 @@ export default function App() {
           const defaultSc = scData.scenarios[0];
           setSelectedScenarioId(defaultSc.id);
           setDay(defaultSc.defaultDay);
+          if (!initialSimulationFiredRef.current) {
+            initialSimulationFiredRef.current = true;
+            runSimulation(defaultSc.id, 0.5, defaultSc.defaultDay);
+          }
         }
 
         // Benchmark data
@@ -80,16 +86,23 @@ export default function App() {
     initData();
   }, []);
 
-  // Run simulation when scenario or day changes
+  // Run simulation when scenario or day changes (AbortController ile mükerrer istekler iptal edilir)
   const runSimulation = async (scId = selectedScenarioId, fVal = f, dayVal = day, isRetry = false) => {
+    if (activeControllerRef.current) {
+      activeControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    activeControllerRef.current = controller;
+
     setLoading(true);
     if (!isRetry) {
-      setToast(null); // Yeni bağımsız simülasyon başlarken önceki Toast'ı temizle
+      setToast(null);
     }
     try {
       const res = await fetch('/api/simulate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           scenarioId: scId,
           f: fVal,
@@ -98,9 +111,11 @@ export default function App() {
       });
 
       const data = await res.json();
+      if (activeControllerRef.current !== controller) return;
+
       if (data.success && data.simulation && !data.simulation.hata) {
         setSimulation(data.simulation);
-        setToast(null); // Başarılı simülasyonda önceki hata uyarısını kapat
+        setToast(null);
       } else {
         setSimulation(null);
         const errorText = sanitizeErrorMessage(data.error || data.simulation?.hata);
@@ -114,6 +129,10 @@ export default function App() {
         });
       }
     } catch (err) {
+      if (err.name === 'AbortError') {
+        return; // Yeni bir istek başladığı için iptal edildi, hata gösterme
+      }
+      if (activeControllerRef.current !== controller) return;
       console.error('Simulation run error:', err);
       setSimulation(null);
       setToast({
@@ -125,7 +144,9 @@ export default function App() {
         retryParams: { scId, fVal, dayVal },
       });
     } finally {
-      setLoading(false);
+      if (activeControllerRef.current === controller) {
+        setLoading(false);
+      }
     }
   };
 
@@ -136,12 +157,7 @@ export default function App() {
     runSimulation(scId, fVal, dayVal, true);
   };
 
-  // Run initial simulation once scenarios are ready
-  useEffect(() => {
-    if (scenarios.length > 0) {
-      runSimulation(selectedScenarioId, f, day);
-    }
-  }, [scenarios]);
+  // Initial simulation artık initData içinde tek seferlik tetiklenmektedir (çift istek önlendi)
 
   // Handle Scenario Switch
   const handleSelectScenario = (id) => {
@@ -236,12 +252,12 @@ export default function App() {
               </button>
             </div>
 
-            {/* Loading State when simulation is not yet available */}
-            {loading && !simulation && (
-              <div className="bg-white border border-slate-200 rounded-xl py-8 px-4 mb-5 flex items-center justify-center space-x-2.5 shadow-2xs">
+            {/* Loading State when simulation is running */}
+            {loading && (
+              <div className="bg-white border border-slate-200 rounded-xl py-6 px-4 mb-5 flex items-center justify-center space-x-2.5 shadow-2xs">
                 <RefreshCw className="w-4 h-4 text-emerald-700 animate-spin shrink-0" />
                 <span className="text-xs font-semibold text-slate-700">
-                  Simülasyon hesaplanıyor…
+                  Simülasyon hesaplanıyor… (Ücretsiz sunucu yavaş olabilir, hesaplama 30–60 sn sürebilir)
                 </span>
               </div>
             )}

@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { SCENARIOS } from './scenarios.js';
 import { pythonProcessQueue } from '../utils/processQueue.js';
+import { executeWithCacheAndSingleFlight } from '../utils/calculationCache.js';
 
 const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -34,6 +35,159 @@ function resolvePythonExecutable() {
   }
   cachedPythonExecutable = process.platform === 'win32' ? 'py' : 'python3';
   return cachedPythonExecutable;
+}
+
+/**
+ * Tek bir simülasyonu Python motoru üzerinden çalıştırır
+ */
+export async function executePythonSimulate(params = {}) {
+  const { scenarioId = 'isyeri_gunduz', f = 0.5, capKw, day, seed = 42 } = params;
+  const numF = Number(f);
+  const numSeed = Number.isFinite(Number(seed)) ? Math.trunc(Number(seed)) : 42;
+
+  const pythonArgs = [
+    '-m',
+    'sarjdenge.web_servis',
+    '--senaryo',
+    String(scenarioId),
+    '--f',
+    String(numF),
+    '--tohum',
+    String(numSeed),
+    '--json',
+  ];
+
+  if (capKw !== undefined && capKw !== null && capKw !== '') {
+    pythonArgs.push('--cap', String(Number(capKw)));
+  }
+  if (day !== undefined && day !== null && String(day).trim() !== '') {
+    pythonArgs.push('--gun', String(day).trim());
+  }
+
+  let releaseLock;
+  try {
+    releaseLock = await pythonProcessQueue.acquire();
+  } catch (queueErr) {
+    throw queueErr;
+  }
+
+  let lockReleased = false;
+  const safeRelease = () => {
+    if (!lockReleased && typeof releaseLock === 'function') {
+      lockReleased = true;
+      releaseLock();
+    }
+  };
+
+  const pythonExecutable = resolvePythonExecutable();
+  const startTime = Date.now();
+
+  return new Promise((resolve, reject) => {
+    try {
+      const pyProcess = spawn(pythonExecutable, pythonArgs, {
+        cwd: PROJECT_ROOT,
+        env: { ...process.env, PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1' },
+      });
+
+      let stdoutData = '';
+      let stderrData = '';
+      let responded = false;
+      let timedOut = false;
+
+      // Render 100s proxy sınırına uygun makul süre (50 sn)
+      const timeoutLimit = 50000;
+      const timeoutId = setTimeout(() => {
+        timedOut = true;
+        if (!pyProcess.killed) {
+          pyProcess.kill();
+        }
+      }, timeoutLimit);
+
+      pyProcess.stdout.on('data', chunk => {
+        stdoutData += chunk.toString('utf-8');
+      });
+
+      pyProcess.stderr.on('data', chunk => {
+        stderrData += chunk.toString('utf-8');
+      });
+
+      pyProcess.on('error', err => {
+        clearTimeout(timeoutId);
+        safeRelease();
+        if (responded) return;
+        responded = true;
+        console.error(`[Python Engine] Simulate HATA: ${err.message}`);
+        const spawnErr = new Error('Simülasyon süreci başlatılamadı.');
+        spawnErr.status = 500;
+        spawnErr.details = err.message;
+        reject(spawnErr);
+      });
+
+      pyProcess.on('close', code => {
+        clearTimeout(timeoutId);
+        safeRelease();
+        if (responded) return;
+        responded = true;
+
+        const duration = Date.now() - startTime;
+
+        if (timedOut) {
+          console.error(`[Python Engine] Simulate ZAMAN AŞIMI (${duration}ms) | Senaryo: ${scenarioId}`);
+          const toErr = new Error('Simülasyon hesaplaması zaman aşımına uğradı (50 sn).');
+          toErr.status = 504;
+          return reject(toErr);
+        }
+
+        if (code !== 0) {
+          let extractedError = 'Simülasyon motoru hata verdi.';
+          try {
+            const parsedErr = JSON.parse(stderrData.replace(/^\uFEFF/, '').trim());
+            if (parsedErr?.hata) {
+              extractedError = parsedErr.hata;
+            }
+          } catch {
+            // Ham stderr korunur
+          }
+          console.error(`[Python Engine] Simulate HATA (${code}) [${duration}ms]: ${extractedError}`);
+          const procErr = new Error(extractedError);
+          procErr.status = 500;
+          procErr.details = stderrData || stdoutData;
+          return reject(procErr);
+        }
+
+        try {
+          const cleanJson = stdoutData.replace(/^\uFEFF/, '').trim();
+          const result = JSON.parse(cleanJson);
+
+          if (result?.hata) {
+            const bizErr = new Error(result.hata);
+            bizErr.status = 422;
+            bizErr.details = result;
+            return reject(bizErr);
+          }
+
+          if (!result || !result.kpi_ozet || !Array.isArray(result.araclar) || !(result.arac_sayisi > 0)) {
+            const valErr = new Error('Seçilen senaryo ve günde geçerli simülasyon sonucu üretilemedi.');
+            valErr.status = 422;
+            return reject(valErr);
+          }
+
+          // Başarılı hesaplama süresi logu (Render loglarında görünür)
+          console.log(`[Python Engine] Simulate tamamlandı (${duration}ms) | Senaryo: ${scenarioId}, f: ${numF}, Gün: ${day || 'varsayılan'}`);
+          resolve(result);
+        } catch (parseErr) {
+          console.error(`[Python Engine] Simulate JSON parse hatası (${duration}ms):`, parseErr);
+          const pErr = new Error('Simülasyon çıktısı JSON olarak okunamadı.');
+          pErr.status = 500;
+          pErr.raw = stdoutData.slice(0, 500);
+          reject(pErr);
+        }
+      });
+    } catch (err) {
+      safeRelease();
+      reject(err);
+    }
+  });
 }
 
 router.post('/', async (req, res) => {
@@ -74,170 +228,23 @@ router.post('/', async (req, res) => {
     }
   }
 
-  const numSeed = Number.isFinite(Number(seed)) ? Math.trunc(Number(seed)) : 42;
-
-  const pythonArgs = [
-    '-m',
-    'sarjdenge.web_servis',
-    '--senaryo',
-    String(scenarioId),
-    '--f',
-    String(numF),
-    '--tohum',
-    String(numSeed),
-    '--json',
-  ];
-
-  if (capKw !== undefined && capKw !== null && capKw !== '') {
-    pythonArgs.push('--cap', String(Number(capKw)));
-  }
-  if (day !== undefined && day !== null && String(day).trim() !== '') {
-    pythonArgs.push('--gun', String(day).trim());
-  }
-
-  // Bellek koruması: Eşzamanlı Python sürecini 1 ile sınırla
-  let releaseLock;
   try {
-    releaseLock = await pythonProcessQueue.acquire();
-  } catch (queueErr) {
-    return res.status(queueErr.status || 503).json({
-      success: false,
-      error: queueErr.message,
-      code: queueErr.code || 'SERVER_BUSY',
-    });
-  }
-
-  let lockReleased = false;
-  const safeRelease = () => {
-    if (!lockReleased && typeof releaseLock === 'function') {
-      lockReleased = true;
-      releaseLock();
-    }
-  };
-
-  const pythonExecutable = resolvePythonExecutable();
-
-  try {
-    const pyProcess = spawn(pythonExecutable, pythonArgs, {
-      cwd: PROJECT_ROOT,
-      env: { ...process.env, PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1' },
+    const { data: result, source } = await executeWithCacheAndSingleFlight('simulate', req.body, async () => {
+      return await executePythonSimulate(req.body);
     });
 
-    let stdoutData = '';
-    let stderrData = '';
-    let responded = false;
-    let timedOut = false;
-
-    const timeoutId = setTimeout(() => {
-      timedOut = true;
-      if (!pyProcess.killed) {
-        pyProcess.kill();
-      }
-    }, 25000);
-
-    req.on('close', () => {
-      if (!responded && !pyProcess.killed) {
-        pyProcess.kill();
-        safeRelease();
-      }
-    });
-
-    pyProcess.stdout.on('data', chunk => {
-      stdoutData += chunk.toString('utf-8');
-    });
-
-    pyProcess.stderr.on('data', chunk => {
-      stderrData += chunk.toString('utf-8');
-    });
-
-    pyProcess.on('error', err => {
-      clearTimeout(timeoutId);
-      safeRelease();
-      if (responded) return;
-      responded = true;
-      if (process.env.NODE_ENV !== 'test') {
-        console.error('[Simulate Spawn Error]:', err);
-      }
-      return res.status(500).json({
-        success: false,
-        error: 'Simülasyon süreci başlatılamadı.',
-        details: err.message,
-      });
-    });
-
-    pyProcess.on('close', code => {
-      clearTimeout(timeoutId);
-      safeRelease();
-      if (responded) return;
-      responded = true;
-
-      if (timedOut) {
-        return res.status(504).json({
-          success: false,
-          error: 'Simülasyon hesaplaması zaman aşımına uğradı (25 sn).',
-        });
-      }
-
-      if (code !== 0) {
-        let extractedError = 'Simülasyon motoru hata verdi.';
-        try {
-          const parsedErr = JSON.parse(stderrData.replace(/^\uFEFF/, '').trim());
-          if (parsedErr?.hata) {
-            extractedError = parsedErr.hata;
-          }
-        } catch {
-          // Ham stderr ayrıntılarda korunur
-        }
-        if (process.env.NODE_ENV !== 'test') {
-          console.error('[Simulate Engine Error]:', stderrData || stdoutData);
-        }
-        return res.status(500).json({
-          success: false,
-          error: extractedError,
-          details: stderrData || stdoutData,
-        });
-      }
-
-      try {
-        const cleanJson = stdoutData.replace(/^\uFEFF/, '').trim();
-        const result = JSON.parse(cleanJson);
-
-        if (result?.hata) {
-          return res.status(422).json({
-            success: false,
-            error: result.hata,
-            details: result,
-          });
-        }
-
-        if (!result || !result.kpi_ozet || !Array.isArray(result.araclar) || !(result.arac_sayisi > 0)) {
-          return res.status(422).json({
-            success: false,
-            error: 'Seçilen senaryo ve günde geçerli simülasyon sonucu üretilemedi.',
-          });
-        }
-
-        return res.json({
-          success: true,
-          simulation: result,
-        });
-      } catch (parseErr) {
-        if (process.env.NODE_ENV !== 'test') {
-          console.error('[Simulate Parse Error]:', parseErr, stdoutData.slice(0, 500));
-        }
-        return res.status(500).json({
-          success: false,
-          error: 'Simülasyon çıktısı JSON olarak okunamadı.',
-          raw: stdoutData.slice(0, 500),
-        });
-      }
+    return res.json({
+      success: true,
+      simulation: result,
+      _source: source,
     });
   } catch (err) {
-    safeRelease();
-    res.status(500).json({
+    const statusCode = err.status || 500;
+    return res.status(statusCode).json({
       success: false,
-      error: 'Simülasyon süreci başlatılamadı.',
-      message: err.message,
+      error: err.message || 'Simülasyon yürütülemedi.',
+      code: err.code,
+      details: err.details,
     });
   }
 });

@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { SCENARIOS } from './scenarios.js';
 import { pythonProcessQueue } from '../utils/processQueue.js';
+import { executeWithCacheAndSingleFlight } from '../utils/calculationCache.js';
 
 const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -36,6 +37,158 @@ function resolvePythonExecutable() {
   return cachedPythonExecutable;
 }
 
+/**
+ * Tek bir Kapasite Danışmanı hesabını Python motoru üzerinden çalıştırır
+ */
+export async function executePythonAdvisor(params = {}) {
+  const { scenarioId = 'isyeri_gunduz', day, seed = 42, multiDay = false } = params;
+  const numSeed = Number.isFinite(Number(seed)) ? Math.trunc(Number(seed)) : 42;
+
+  const pythonArgs = [
+    '-m',
+    'sarjdenge.web_servis',
+    '--advisor',
+    '--senaryo',
+    String(scenarioId),
+    '--tohum',
+    String(numSeed),
+  ];
+
+  if (multiDay) {
+    pythonArgs.push('--cok-gunlu');
+  }
+
+  if (day !== undefined && day !== null && String(day).trim() !== '') {
+    pythonArgs.push('--gun', String(day).trim());
+  }
+
+  let releaseLock;
+  try {
+    releaseLock = await pythonProcessQueue.acquire();
+  } catch (queueErr) {
+    throw queueErr;
+  }
+
+  let lockReleased = false;
+  const safeRelease = () => {
+    if (!lockReleased && typeof releaseLock === 'function') {
+      lockReleased = true;
+      releaseLock();
+    }
+  };
+
+  const pythonExecutable = resolvePythonExecutable();
+  const startTime = Date.now();
+
+  return new Promise((resolve, reject) => {
+    try {
+      const pyProcess = spawn(pythonExecutable, pythonArgs, {
+        cwd: PROJECT_ROOT,
+        env: { ...process.env, PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1' },
+      });
+
+      let stdoutData = '';
+      let stderrData = '';
+      let responded = false;
+      let timedOut = false;
+
+      // Tek gün için 65 sn, çok gün için 210 sn
+      const timeoutLimit = multiDay ? 210000 : 65000;
+      const timeoutSec = Math.round(timeoutLimit / 1000);
+      const timeoutId = setTimeout(() => {
+        timedOut = true;
+        if (!pyProcess.killed) {
+          pyProcess.kill();
+        }
+      }, timeoutLimit);
+
+      pyProcess.stdout.on('data', chunk => {
+        stdoutData += chunk.toString('utf-8');
+      });
+
+      pyProcess.stderr.on('data', chunk => {
+        stderrData += chunk.toString('utf-8');
+      });
+
+      pyProcess.on('error', err => {
+        clearTimeout(timeoutId);
+        safeRelease();
+        if (responded) return;
+        responded = true;
+        console.error(`[Python Engine] Advisor HATA: ${err.message}`);
+        const spawnErr = new Error('Kapasite Danışmanı süreci başlatılamadı.');
+        spawnErr.status = 500;
+        spawnErr.details = err.message;
+        reject(spawnErr);
+      });
+
+      pyProcess.on('close', code => {
+        clearTimeout(timeoutId);
+        safeRelease();
+        if (responded) return;
+        responded = true;
+
+        const duration = Date.now() - startTime;
+
+        if (timedOut) {
+          console.error(`[Python Engine] Advisor ZAMAN AŞIMI (${duration}ms) | Senaryo: ${scenarioId}`);
+          const toErr = new Error(`Kapasite Danışmanı hesaplaması zaman aşımına uğradı (${timeoutSec} sn).`);
+          toErr.status = 504;
+          return reject(toErr);
+        }
+
+        if (code !== 0) {
+          let extractedError = 'Kapasite Danışmanı hesaplama motoru hata verdi.';
+          try {
+            const parsedErr = JSON.parse(stderrData.replace(/^\uFEFF/, '').trim());
+            if (parsedErr?.hata) {
+              extractedError = parsedErr.hata;
+            }
+          } catch {
+            // Ham stderr korunur
+          }
+          console.error(`[Python Engine] Advisor HATA (${code}) [${duration}ms]: ${extractedError}`);
+          const procErr = new Error(extractedError);
+          procErr.status = 500;
+          procErr.details = stderrData || stdoutData;
+          return reject(procErr);
+        }
+
+        try {
+          const cleanJson = stdoutData.replace(/^\uFEFF/, '').trim();
+          const result = JSON.parse(cleanJson);
+
+          if (result?.hata) {
+            const bizErr = new Error(result.hata);
+            bizErr.status = 422;
+            bizErr.details = result;
+            return reject(bizErr);
+          }
+
+          if (!result || !Array.isArray(result.yontemler) || !(result.arac_sayisi > 0)) {
+            const valErr = new Error('Seçilen senaryo ve günde geçerli kapasite analizi üretilemedi.');
+            valErr.status = 422;
+            return reject(valErr);
+          }
+
+          // Başarılı hesaplama süresi logu (Render loglarında görünür)
+          console.log(`[Python Engine] Advisor tamamlandı (${duration}ms) | Senaryo: ${scenarioId}, Gün: ${day || 'varsayılan'}`);
+          resolve(result);
+        } catch (parseErr) {
+          console.error(`[Python Engine] Advisor JSON parse hatası (${duration}ms):`, parseErr);
+          const pErr = new Error('Kapasite Danışmanı çıktısı JSON olarak okunamadı.');
+          pErr.status = 500;
+          pErr.raw = stdoutData.slice(0, 500);
+          reject(pErr);
+        }
+      });
+    } catch (err) {
+      safeRelease();
+      reject(err);
+    }
+  });
+}
+
 router.post('/', async (req, res) => {
   const { scenarioId = 'isyeri_gunduz', day, seed = 42, multiDay = false } = req.body || {};
 
@@ -64,171 +217,23 @@ router.post('/', async (req, res) => {
     }
   }
 
-  const numSeed = Number.isFinite(Number(seed)) ? Math.trunc(Number(seed)) : 42;
-
-  const pythonArgs = [
-    '-m',
-    'sarjdenge.web_servis',
-    '--advisor',
-    '--senaryo',
-    String(scenarioId),
-    '--tohum',
-    String(numSeed),
-  ];
-
-  if (multiDay) {
-    pythonArgs.push('--cok-gunlu');
-  }
-
-  if (day !== undefined && day !== null && String(day).trim() !== '') {
-    pythonArgs.push('--gun', String(day).trim());
-  }
-
-  // 2. Bellek koruması: Eşzamanlı Python sürecini 1 ile sınırla
-  let releaseLock;
   try {
-    releaseLock = await pythonProcessQueue.acquire();
-  } catch (queueErr) {
-    return res.status(queueErr.status || 503).json({
-      success: false,
-      error: queueErr.message,
-      code: queueErr.code || 'SERVER_BUSY',
-    });
-  }
-
-  let lockReleased = false;
-  const safeRelease = () => {
-    if (!lockReleased && typeof releaseLock === 'function') {
-      lockReleased = true;
-      releaseLock();
-    }
-  };
-
-  const pythonExecutable = resolvePythonExecutable();
-
-  try {
-    const pyProcess = spawn(pythonExecutable, pythonArgs, {
-      cwd: PROJECT_ROOT,
-      env: { ...process.env, PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1' },
+    const { data: result, source } = await executeWithCacheAndSingleFlight('capacityAdvisor', req.body, async () => {
+      return await executePythonAdvisor(req.body);
     });
 
-    let stdoutData = '';
-    let stderrData = '';
-    let responded = false;
-    let timedOut = false;
-
-    const timeoutLimit = multiDay ? 210000 : 35000;
-    const timeoutSec = Math.round(timeoutLimit / 1000);
-    const timeoutId = setTimeout(() => {
-      timedOut = true;
-      if (!pyProcess.killed) {
-        pyProcess.kill();
-      }
-    }, timeoutLimit);
-
-    req.on('close', () => {
-      if (!responded && !pyProcess.killed) {
-        pyProcess.kill();
-        safeRelease();
-      }
-    });
-
-    pyProcess.stdout.on('data', chunk => {
-      stdoutData += chunk.toString('utf-8');
-    });
-
-    pyProcess.stderr.on('data', chunk => {
-      stderrData += chunk.toString('utf-8');
-    });
-
-    pyProcess.on('error', err => {
-      clearTimeout(timeoutId);
-      safeRelease();
-      if (responded) return;
-      responded = true;
-      if (process.env.NODE_ENV !== 'test') {
-        console.error('[Advisor Spawn Error]:', err);
-      }
-      return res.status(500).json({
-        success: false,
-        error: 'Kapasite Danışmanı süreci başlatılamadı.',
-        details: err.message,
-      });
-    });
-
-    pyProcess.on('close', code => {
-      clearTimeout(timeoutId);
-      safeRelease();
-      if (responded) return;
-      responded = true;
-
-      if (timedOut) {
-        return res.status(504).json({
-          success: false,
-          error: `Kapasite Danışmanı hesaplaması zaman aşımına uğradı (${timeoutSec} sn).`,
-        });
-      }
-
-      if (code !== 0) {
-        let extractedError = 'Kapasite Danışmanı hesaplama motoru hata verdi.';
-        try {
-          const parsedErr = JSON.parse(stderrData.replace(/^\uFEFF/, '').trim());
-          if (parsedErr?.hata) {
-            extractedError = parsedErr.hata;
-          }
-        } catch {
-          // Ham stderr ayrıntılarda korunur
-        }
-        if (process.env.NODE_ENV !== 'test') {
-          console.error('[Advisor Engine Error]:', stderrData || stdoutData);
-        }
-        return res.status(500).json({
-          success: false,
-          error: extractedError,
-          details: stderrData || stdoutData,
-        });
-      }
-
-      try {
-        const cleanJson = stdoutData.replace(/^\uFEFF/, '').trim();
-        const result = JSON.parse(cleanJson);
-
-        if (result?.hata) {
-          return res.status(422).json({
-            success: false,
-            error: result.hata,
-            details: result,
-          });
-        }
-
-        if (!result || !Array.isArray(result.yontemler) || !(result.arac_sayisi > 0)) {
-          return res.status(422).json({
-            success: false,
-            error: 'Seçilen senaryo ve günde geçerli kapasite analizi üretilemedi.',
-          });
-        }
-
-        return res.json({
-          success: true,
-          advisor: result,
-        });
-      } catch (parseErr) {
-        if (process.env.NODE_ENV !== 'test') {
-          console.error('[Advisor Parse Error]:', parseErr, stdoutData.slice(0, 500));
-        }
-        return res.status(500).json({
-          success: false,
-          error: 'Kapasite Danışmanı çıktısı JSON olarak okunamadı.',
-          raw: stdoutData.slice(0, 500),
-        });
-      }
+    return res.json({
+      success: true,
+      advisor: result,
+      _source: source,
     });
   } catch (err) {
-    safeRelease();
-    res.status(500).json({
+    const statusCode = err.status || 500;
+    return res.status(statusCode).json({
       success: false,
-      error: 'Kapasite Danışmanı süreci başlatılamadı.',
-      message: err.message,
+      error: err.message || 'Kapasite analizi üretilemedi.',
+      code: err.code,
+      details: err.details,
     });
   }
 });

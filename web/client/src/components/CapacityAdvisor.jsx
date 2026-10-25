@@ -230,7 +230,7 @@ export default function CapacityAdvisor({
           <span className="text-xs font-semibold text-slate-700">
             {isMultiDay
               ? 'Çok günlü kapasite analizi yürütülüyor (≥20 gün taranıyor, bu işlem 1–2 dakika sürebilir)…'
-              : 'Kapasite hesaplanıyor…'}
+              : 'Kapasite hesaplanıyor… (Ücretsiz sunucu yavaş olabilir, hesaplama 30–60 sn sürebilir)'}
           </span>
         </div>
       )}
