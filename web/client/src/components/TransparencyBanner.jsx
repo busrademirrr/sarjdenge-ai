@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { AlertCircle, ChevronDown, ChevronUp, CheckCircle2, Info } from 'lucide-react';
 
 export default function TransparencyBanner() {
@@ -14,15 +14,15 @@ export default function TransparencyBanner() {
           <div>
             <div className="flex items-center space-x-2 flex-wrap gap-y-1">
               <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
-                ├ûnkay─▒tl─▒ Hipotez De─şerlendirmesi
+                Önkayıtlı Hipotez Değerlendirmesi
               </span>
               <span className="text-xs sm:text-sm font-bold text-slate-900">
-                ├ûnkay─▒tl─▒ hipotez desteklenmedi
+                Önkayıtlı hipotez desteklenmedi
               </span>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed max-w-4xl">
-              ├ûnkay─▒tl─▒ ba┼şar─▒ ├Âl├ğ├╝t├╝ kar┼ş─▒lanmad─▒: fark─▒n en az +2 y├╝zde puan olmas─▒ ve %95 g├╝ven aral─▒─ş─▒n─▒n alt s─▒n─▒r─▒n─▒n s─▒f─▒r─▒n ├╝zerinde bulunmas─▒ gerekiyordu.
-              G├Âzlenen davran─▒┼ş i├ğin olas─▒ a├ğ─▒klama (├ğal─▒┼şma hipotezi), konservatif q80 enerji ve q20 s├╝re tahminlerinin LP-MPC'de kapasiteyi erken ad─▒mlarda belirli ara├ğlara ay─▒rmas─▒d─▒r.
+              Önkayıtlı başarı ölçütü karşılanmadı: farkın en az +2 yüzde puan olması ve %95 güven aralığının alt sınırının sıfırın üzerinde bulunması gerekiyordu.
+              Gözlenen davranış için olası açıklama (çalışma hipotezi), konservatif q80 enerji ve q20 süre tahminlerinin LP-MPC'de kapasiteyi erken adımlarda belirli araçlara ayırmasıdır.
             </p>
           </div>
         </div>
@@ -31,46 +31,46 @@ export default function TransparencyBanner() {
           onClick={() => setExpanded(!expanded)}
           className="flex items-center space-x-1.5 text-xs text-slate-700 hover:text-slate-900 font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 transition shrink-0 ml-2"
         >
-          <span>{expanded ? 'Kapat' : 'Olas─▒ Mekanizma & Bulgular'}</span>
+          <span>{expanded ? 'Kapat' : 'Olası Mekanizma & Bulgular'}</span>
           {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
         </button>
       </div>
 
       {expanded && (
         <div className="mt-4 pt-4 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs text-slate-700">
-          {/* Card 1: E┼şle┼ştirilmi┼ş Bootstrap Sonu├ğlar─▒ */}
+          {/* Card 1: Eşleştirilmiş Bootstrap Sonuçları */}
           <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
             <div className="flex items-center space-x-2 text-slate-800 font-bold mb-2">
               <Info className="w-4 h-4 shrink-0 text-slate-600" />
-              <span>E┼şle┼ştirilmi┼ş Bootstrap (B = 2.000)</span>
+              <span>Eşleştirilmiş Bootstrap (B = 2.000)</span>
             </div>
             <ul className="space-y-1.5 text-slate-600 text-xs">
-              <li>ÔÇó <strong className="text-slate-800">f = 0,50:</strong> ╬ö = -0,17 y.p. (%95 GA: [-0,66, +0,28] y.p.)</li>
-              <li>ÔÇó <strong className="text-slate-800">f = 0,70:</strong> ╬ö = -0,58 y.p. (%95 GA: [-1,06, -0,10] y.p.)</li>
-              <li>ÔÇó <strong className="text-slate-800">f = 0,90:</strong> ╬ö = -0,02 y.p. (%95 GA: [-0,22, +0,17] y.p.)</li>
-              <li className="text-slate-700 font-medium pt-1 border-t border-slate-200">S─▒f─▒r hipotezi reddedilemedi. G├╝ven aral─▒klar─▒ s─▒f─▒r─▒ kapsamakta veya alt─▒ndad─▒r.</li>
+              <li>• <strong className="text-slate-800">f = 0,50:</strong> Δ = -0,17 y.p. (%95 GA: [-0,66, +0,28] y.p.)</li>
+              <li>• <strong className="text-slate-800">f = 0,70:</strong> Δ = -0,58 y.p. (%95 GA: [-1,06, -0,10] y.p.)</li>
+              <li>• <strong className="text-slate-800">f = 0,90:</strong> Δ = -0,02 y.p. (%95 GA: [-0,22, +0,17] y.p.)</li>
+              <li className="text-slate-700 font-medium pt-1 border-t border-slate-200">Önkayıtlı ölçüt karşılanmadı: f=0,5 ve 0,7'de fark negatif, f=0,9'da sıfırdan ayırt edilemiyor.</li>
             </ul>
           </div>
 
-          {/* Card 2: Olas─▒ Mekanizma */}
+          {/* Card 2: Gözlenen Davranış İçin Olası Açıklama */}
           <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
             <div className="flex items-center space-x-2 text-slate-800 font-bold mb-2">
               <AlertCircle className="w-4 h-4 shrink-0 text-slate-600" />
-              <span>Olas─▒ Mekanizma (├çal─▒┼şma Hipotezi)</span>
+              <span>Gözlenen Davranış İçin Olası Açıklama</span>
             </div>
             <p className="text-slate-600 text-xs leading-relaxed">
-              G├Âzlenen davran─▒┼ş i├ğin olas─▒ a├ğ─▒klama: Y├╝ksek <code className="text-slate-800 bg-slate-200/60 px-1 rounded font-mono text-xs">q80 enerji</code> ve k─▒sa <code className="text-slate-800 bg-slate-200/60 px-1 rounded font-mono text-xs">q20 s├╝re</code> k─▒s─▒tlar─▒n─▒n, LP-MPC ├ğ├Âz├╝c├╝s├╝nde kapasiteyi erken ad─▒mlarda konservatif bi├ğimde belirli ara├ğlara ay─▒rmas─▒d─▒r (hayalet kapasite rezervasyonu).
+              Güvenli q80 hedefi oturumların yaklaşık %12'sinde (2020 holdout) gerçek ihtiyacın %95'inin altında kalıyor; kullanıcı beyanında bu oran %2,55. Dar kapasitede bu araçlar hedefe ulaşamıyor. Bu, gözlenen farkla uyumlu bir açıklamadır; nedensel olarak kanıtlanmamıştır.
             </p>
           </div>
 
-          {/* Card 3: De─şerlendirme Bulgusu */}
+          {/* Card 3: Değerlendirme Bulgusu */}
           <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
             <div className="flex items-center space-x-2 text-slate-800 font-bold mb-2">
               <CheckCircle2 className="w-4 h-4 shrink-0 text-slate-600" />
-              <span>De─şerlendirme Bulgusu</span>
+              <span>Değerlendirme Bulgusu</span>
             </div>
             <p className="text-slate-600 text-xs leading-relaxed">
-              Bu de─şerlendirmede EDF baz─▒ kapasite d├╝zeylerinde y├╝ksek hedef kar┼ş─▒lama sonu├ğlar─▒ vermi┼ştir. Algoritmalar─▒n performans─▒ kapasite d├╝zeyine ve kullan─▒lan metri─şe g├Âre kar┼ş─▒la┼şt─▒r─▒lmal─▒d─▒r.
+              Bu değerlendirmede EDF bazı kapasite düzeylerinde yüksek hedef karşılama sonuçları vermiştir. Algoritmaların performansı kapasite düzeyine ve kullanılan metriğe göre karşılaştırılmalıdır.
             </p>
           </div>
         </div>

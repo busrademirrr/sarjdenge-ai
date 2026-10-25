@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -8,7 +8,6 @@ import scenariosRouter from './routes/scenarios.js';
 import benchmarkRouter from './routes/benchmark.js';
 import simulateRouter from './routes/simulate.js';
 import capacityAdvisorRouter from './routes/capacityAdvisor.js';
-import authRouter from './routes/auth.js';
 import exportRouter from './routes/export.js';
 
 dotenv.config();
@@ -39,14 +38,13 @@ app.use('/api/scenarios', scenariosRouter);
 app.use('/api/benchmark-results', benchmarkRouter);
 app.use('/api/simulate', simulateRouter);
 app.use('/api/capacity-advisor', capacityAdvisorRouter);
-app.use('/api/auth', authRouter);
 app.use('/api/export', exportRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    app: '┼ŞarjDenge AI Decision Support Server',
+    app: 'ŞarjDenge AI Decision Support Server',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
   });
@@ -54,22 +52,29 @@ app.get('/api/health', (req, res) => {
 
 // Serve frontend static build if available
 const clientDist = path.resolve(__dirname, '../client/dist');
-app.use(express.static(clientDist));
+app.use(express.static(clientDist, {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+  }
+}));
 
 app.get('*', (req, res, next) => {
   if (req.path.startsWith('/api')) {
     return next();
   }
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.sendFile(path.join(clientDist, 'index.html'), err => {
     if (err) {
       res.status(200).send(`
         <!DOCTYPE html>
         <html>
-        <head><title>┼ŞarjDenge AI Backend</title></head>
+        <head><title>ŞarjDenge AI Backend</title></head>
         <body style="font-family: sans-serif; padding: 40px; text-align: center;">
-          <h2>ÔÜí ┼ŞarjDenge AI API Servisi ├çal─▒┼ş─▒yor</h2>
-          <p>Frontend geli┼ştirme sunucusu port 5173'te ├ğal─▒┼şmaktad─▒r.</p>
-          <p><a href="/api/scenarios">/api/scenarios</a> ÔÇó <a href="/api/benchmark-results">/api/benchmark-results</a></p>
+          <h2>⚡ ŞarjDenge AI API Servisi Çalışıyor</h2>
+          <p>Frontend geliştirme sunucusu port 5173'te çalışmaktadır.</p>
+          <p><a href="/api/scenarios">/api/scenarios</a> • <a href="/api/benchmark-results">/api/benchmark-results</a></p>
         </body>
         </html>
       `);
@@ -82,7 +87,7 @@ app.use((err, req, res, next) => {
   console.error('[API Error]:', err);
   res.status(500).json({
     success: false,
-    error: 'Sunucu taraf─▒nda bir hata meydana geldi.',
+    error: 'Sunucu tarafında bir hata meydana geldi.',
     details: err.message,
   });
 });
@@ -91,7 +96,7 @@ const isTest = process.env.NODE_ENV === 'test' || process.argv.some(arg => arg.i
 
 if (!isTest) {
   app.listen(PORT, () => {
-    console.log(`ÔÜí ┼ŞarjDenge AI Backend http://localhost:${PORT} ├╝zerinde dinliyor.`);
+    console.log(`⚡ ŞarjDenge AI Backend http://localhost:${PORT} üzerinde dinliyor.`);
   });
 }
 

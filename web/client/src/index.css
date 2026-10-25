@@ -1,4 +1,4 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -30,7 +30,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  /* Tek ve tutarl─▒ sans-serif yaz─▒ ailesi + say─▒sal hizalama i├ğin tabular-nums */
+  /* Tek ve tutarlı sans-serif yazı ailesi + sayısal hizalama için tabular-nums */
   code, pre, .font-mono, table, td, th {
     font-family: var(--font-sans);
     font-variant-numeric: tabular-nums;

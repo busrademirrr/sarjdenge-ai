@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Check } from 'lucide-react';
 
 export default function ScenarioSelector({ scenarios, selectedScenarioId, onSelectScenario }) {
@@ -29,7 +29,7 @@ export default function ScenarioSelector({ scenarios, selectedScenarioId, onSele
                         : 'bg-amber-50 text-amber-800'
                     }`}
                   >
-                    {isReal ? 'ACN Ger├ğek Saha' : 'Sentetik'}
+                    {isReal ? 'ACN Gerçek Saha' : 'Sentetik'}
                   </span>
 
                   {isSelected && (
@@ -46,9 +46,9 @@ export default function ScenarioSelector({ scenarios, selectedScenarioId, onSele
 
               <div className="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 tabular-nums">
                 <span>{sc.sockets} Soket</span>
-                <span>ÔÇó</span>
+                <span>•</span>
                 <span>{sc.socketPowerKw} kW</span>
-                <span>ÔÇó</span>
+                <span>•</span>
                 <span>{sc.transformerKw} kW</span>
               </div>
             </button>

@@ -1,7 +1,7 @@
-﻿{
+{
   "versiyon": "1.0.0",
-  "tanim": "┼ŞarjDenge AI ÔÇö Veriden ├û─şrenilen Beyan Oran─▒ Kuantil Baseline'─▒",
-  "aciklama": "Kullan─▒c─▒n─▒n ilk beyan─▒ (minutesAvailable_ilk ve kWhRequested_ilk) ile ger├ğekle┼şen de─şerler (sure_dk ve kWhDelivered) aras─▒ndaki ampirik oran kuantilleri.",
+  "tanim": "ŞarjDenge AI — Veriden Öğrenilen Beyan Oranı Kuantil Baseline'ı",
+  "aciklama": "Kullanıcının ilk beyanı (minutesAvailable_ilk ve kWhRequested_ilk) ile gerçekleşen değerler (sure_dk ve kWhDelivered) arasındaki ampirik oran kuantilleri.",
   "egitim_kaynagi": "acn_oturumlar_v2.csv",
   "egitim_donemi_baslangic": "2019-01-01 00:00:00 America/Los_Angeles",
   "egitim_donemi_bitis": "2019-04-18 23:59:59 America/Los_Angeles",

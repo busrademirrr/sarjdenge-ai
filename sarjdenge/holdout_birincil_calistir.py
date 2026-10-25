@@ -15,6 +15,7 @@ Bu modül:
 from __future__ import annotations
 
 import json
+import os
 import pathlib
 import time
 import shutil
@@ -27,6 +28,77 @@ from sarjdenge import deney_v2, modeller, veri_hijyeni
 PROJE_KOK = pathlib.Path(__file__).parent.parent
 HOLDOUT_DIR = PROJE_KOK / "data" / "holdout_2020_01_02"
 
+# Düzeltilmiş Çıktı Dosyaları (Eski CSV'lerin üzerine kesinlikle yazılmaz)
+CIKTI_GUNLUK = HOLDOUT_DIR / "deney_gunluk_holdout_2020_birincil_duzeltilmis.csv"
+CIKTI_TABLO = HOLDOUT_DIR / "deney_tablo_holdout_2020_birincil_duzeltilmis.csv"
+CIKTI_BOOT = HOLDOUT_DIR / "deney_boot_holdout_2020_birincil_duzeltilmis.csv"
+CIKTI_BOOT_ERKEN = HOLDOUT_DIR / "deney_boot_erken_holdout_2020_duzeltilmis.csv"
+
+HEDEF_CIKTILAR = [CIKTI_GUNLUK, CIKTI_TABLO, CIKTI_BOOT, CIKTI_BOOT_ERKEN]
+
+
+def duzeltilmis_cikti_dosyalarini_denetle() -> None:
+    """Yeni düzeltilmiş holdout çıktı dosyalarından biri bile varsa deneyi baştan durdurur."""
+    mevcutlar = [str(p.name) for p in HEDEF_CIKTILAR if p.exists()]
+    if mevcutlar:
+        raise FileExistsError(
+            f"GÜVENLİK KALKANI: Düzeltilmiş holdout çıktı dosyaları zaten mevcut: {mevcutlar}. "
+            "Üzerine yazma kesinlikle engellendi. Deney başlatılmadan durduruldu."
+        )
+
+
+def guvenli_cikti_yaz(ciktilar: list[tuple[pd.DataFrame, pathlib.Path]]) -> list[pathlib.Path]:
+    """Dört yeni CSV çıktısını kısmi yazım ve üzerine yazma riskini önleyerek güvenle yazar.
+    
+    Adımlar:
+    1. Hedef dosyaların hiçbirinin mevcut olmadığını doğrular.
+    2. Her DataFrame'i benzersiz bir geçici dosyaya yazar (.tmp_<pid>_<ts>.csv).
+    3. Tüm geçici dosyaların varlığını ve boş olmadığını doğrular.
+    4. Yayımlama öncesinde hedeflerin hâlâ mevcut olmadığını tekrar doğrular.
+    5. Path.rename (hedef varsa FileExistsError fırlatan atomik işlem) ile hedefe taşır.
+    6. Yazma hatası olursa yalnızca bu süreçte açılmış geçici dosyaları temizler.
+    7. Taşıma sırasında hata olursa kısmi yayın durumunu açıkça yönetir ve bildirir.
+    """
+    duzeltilmis_cikti_dosyalarini_denetle()
+
+    olusturulan_tmp = []
+    basariyla_tasinanlar = []
+
+    try:
+        ts_now = int(time.time())
+        pid = os.getpid()
+        for df, hedef_yol in ciktilar:
+            tmp_ad = f"{hedef_yol.stem}.tmp_{pid}_{ts_now}.csv"
+            tmp_yol = hedef_yol.with_name(tmp_ad)
+            df.to_csv(tmp_yol, index=False)
+            olusturulan_tmp.append((tmp_yol, hedef_yol))
+
+        for tmp_yol, _ in olusturulan_tmp:
+            if not tmp_yol.exists() or tmp_yol.stat().st_size == 0:
+                raise IOError(f"Geçici çıktı dosyası doğrulanamadı veya boş: {tmp_yol.name}")
+
+        duzeltilmis_cikti_dosyalarini_denetle()
+
+        for tmp_yol, hedef_yol in olusturulan_tmp:
+            tmp_yol.rename(hedef_yol)
+            basariyla_tasinanlar.append(hedef_yol)
+
+    except Exception as exc:
+        for tmp_yol, hedef_yol in olusturulan_tmp:
+            if hedef_yol not in basariyla_tasinanlar and tmp_yol.exists():
+                try:
+                    tmp_yol.unlink()
+                except OSError:
+                    pass
+        if basariyla_tasinanlar:
+            raise RuntimeError(
+                f"KRİTİK HATA: Kısmi yayın oluştu! Başarıyla taşınanlar: {[p.name for p in basariyla_tasinanlar]}. "
+                f"Hata nedeni: {exc}"
+            ) from exc
+        raise
+
+    return basariyla_tasinanlar
+
 
 def main():
     t_start = time.time()
@@ -34,14 +106,10 @@ def main():
     print("ŞARJDENGE AI — 2020 HOLDOUT BİRİNCİL DEĞERLENDİRME (TÜM UYGUN GÜNLER)")
     print("=" * 70)
 
-    # 1. Mevcut n>=8 Duyarlılık Analizi Dosyalarını Güvenle Koru
-    print("\n[1/5] Mevcut N>=8 duyarlılık analizi dosyaları arşivleniyor...")
-    for f_base in ["deney_gunluk_holdout_2020.csv", "deney_tablo_holdout_2020.csv", "deney_boot_holdout_2020.csv"]:
-        src = HOLDOUT_DIR / f_base
-        if src.exists():
-            dst = HOLDOUT_DIR / f_base.replace(".csv", "_duyarlilik_n8.csv")
-            shutil.copy2(src, dst)
-            print(f"  Arşivlendi: {dst.name}")
+    # 1. Güvenlik Kalkanı Kontrolü (Hedef dosyaların varlığı denetlenir, eski dosyalar korunur)
+    print("\n[1/5] Güvenlik kalkanı denetleniyor...")
+    duzeltilmis_cikti_dosyalarini_denetle()
+    print("  Hedef çıktı dosyalarının mevcut olmadığı doğrulandı; eski CSV dosyaları korundu.")
 
     # 2. Veri Hazırlama (Aynı Option A ve Sızıntısız strict_shift=True)
     print("\n[2/5] 2019 Eğitim ve 2020 Test verileri hazırlanıyor...")
@@ -141,13 +209,18 @@ def main():
     print("\n=== ERKEN AYRILANLAR BOOTSTRAP ANALİZİ ===")
     print(df_boot_erken.to_string(index=False))
 
-    # Dosyalara Kayıt
-    res_df.to_csv(HOLDOUT_DIR / "deney_gunluk_holdout_2020_birincil.csv", index=False)
-    tablo_ozet.to_csv(HOLDOUT_DIR / "deney_tablo_holdout_2020_birincil.csv", index=False)
-    boot_ozet.to_csv(HOLDOUT_DIR / "deney_boot_holdout_2020_birincil.csv", index=False)
-    df_boot_erken.to_csv(HOLDOUT_DIR / "deney_boot_erken_holdout_2020.csv", index=False)
+    # Dosyalara Kayıt (Güvenli, iki aşamalı, kısmi yazım korumalı atomik kayıt)
+    yazilacaklar = [
+        (res_df, CIKTI_GUNLUK),
+        (tablo_ozet, CIKTI_TABLO),
+        (boot_ozet, CIKTI_BOOT),
+        (df_boot_erken, CIKTI_BOOT_ERKEN),
+    ]
+    kaydedilenler = guvenli_cikti_yaz(yazilacaklar)
 
-    print(f"\nTüm birincil dosyalar kaydedildi ({time.time() - t_start:.1f}s)")
+    print(f"\nTüm düzeltilmiş birincil holdout dosyaları kaydedildi ({time.time() - t_start:.1f}s)")
+    for p in kaydedilenler:
+        print(f"  - {p.name}")
 
 
 if __name__ == "__main__":

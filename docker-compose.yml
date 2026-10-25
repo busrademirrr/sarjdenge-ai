@@ -1,0 +1,14 @@
+services:
+  sarjdenge-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sarjdenge-ai:latest
+    container_name: sarjdenge-ai
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - NODE_ENV=production
+      - PYTHON_EXECUTABLE=python3
+    restart: unless-stopped

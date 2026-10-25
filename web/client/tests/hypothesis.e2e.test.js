@@ -1,4 +1,4 @@
-﻿process.env.NODE_ENV = 'test';
+process.env.NODE_ENV = 'test';
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -36,95 +36,95 @@ test.after(async () => {
   }
 });
 
-test('1. Ger├ğek Chrome: Do─şrulama & Hipotez sekmesi a├ğ─▒lmal─▒ ve tekil ana ba┼şl─▒k do─şrulanmal─▒', { timeout: 30000 }, async () => {
+test('1. Gerçek Chrome: Doğrulama & Hipotez sekmesi açılmalı ve tekil ana başlık doğrulanmalı', { timeout: 30000 }, async () => {
   await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
 
-  // 1. Navbar ├╝zerindeki Do─şrulama & Hipotez sekmesine t─▒kla
-  const benchmarkTabBtn = page.locator('nav button', { hasText: 'Do─şrulama & Hipotez' });
+  // 1. Navbar üzerindeki Doğrulama & Hipotez sekmesine tıkla
+  const benchmarkTabBtn = page.locator('nav button', { hasText: 'Doğrulama & Hipotez' });
   await benchmarkTabBtn.waitFor({ state: 'visible', timeout: 5000 });
   await benchmarkTabBtn.click();
 
-  // 2. "├ûnkay─▒tl─▒ hipotez desteklenmedi" ba┼şl─▒─ş─▒n─▒ bul ve do─şrula
-  const heading = page.locator('h2', { hasText: '├ûnkay─▒tl─▒ hipotez desteklenmedi' });
+  // 2. "Önkayıtlı hipotez desteklenmedi" başlığını bul ve doğrula
+  const heading = page.locator('h2', { hasText: 'Önkayıtlı hipotez desteklenmedi' });
   await heading.waitFor({ state: 'visible', timeout: 8000 });
-  assert.ok(await heading.isVisible(), 'Ana ba┼şl─▒k g├Âr├╝n├╝r olmal─▒');
+  assert.ok(await heading.isVisible(), 'Ana başlık görünür olmalı');
 
-  // 3. Bildirimin sayfada sadece 1 kez yer ald─▒─ş─▒n─▒ (m├╝kerrer olmad─▒─ş─▒n─▒) do─şrula
+  // 3. Bildirimin sayfada sadece 1 kez yer aldığını (mükerrer olmadığını) doğrula
   const count = await heading.count();
-  assert.equal(count, 1, '├ûnkay─▒tl─▒ hipotez desteklenmedi ba┼şl─▒─ş─▒ tam olarak 1 kez yer almal─▒ (m├╝kerrer olmamal─▒)');
+  assert.equal(count, 1, 'Önkayıtlı hipotez desteklenmedi başlığı tam olarak 1 kez yer almalı (mükerrer olmamalı)');
 
-  // 4. Alt a├ğ─▒klaman─▒n do─şrulu─şunu kontrol et
-  const subText = page.locator('text=├ûnkay─▒tl─▒ ba┼şar─▒ ├Âl├ğ├╝t├╝ kar┼ş─▒lanmad─▒: fark─▒n en az +2 y├╝zde puan olmas─▒');
-  assert.ok(await subText.isVisible(), 'Alt a├ğ─▒klama g├Âr├╝n├╝r olmal─▒');
+  // 4. Alt açıklamanın doğruluğunu kontrol et
+  const subText = page.locator('text=Önkayıtlı başarı ölçütü karşılanmadı: farkın en az +2 yüzde puan olması');
+  assert.ok(await subText.isVisible(), 'Alt açıklama görünür olmalı');
 });
 
-test('2. Ger├ğek Chrome: "HÔéÇ Korundu" ifadesi bulunmamal─▒ ve EDF ko┼şulsuz ├╝st├╝n olarak sunulmamal─▒', { timeout: 15000 }, async () => {
+test('2. Gerçek Chrome: "H₀ Korundu" ifadesi bulunmamalı ve EDF koşulsuz üstün olarak sunulmamalı', { timeout: 15000 }, async () => {
   const bodyText = await page.innerText('main');
 
-  // 1. "HÔéÇ Korundu" veya "H0 Korundu" ifadesinin bulunmad─▒─ş─▒n─▒ do─şrula
-  assert.ok(!bodyText.includes('HÔéÇ Korundu'), '"HÔéÇ Korundu" ifadesi bulunmamal─▒');
-  assert.ok(!bodyText.includes('H0 Korundu'), '"H0 Korundu" ifadesi bulunmamal─▒');
+  // 1. "H₀ Korundu" veya "H0 Korundu" ifadesinin bulunmadığını doğrula
+  assert.ok(!bodyText.includes('H₀ Korundu'), '"H₀ Korundu" ifadesi bulunmamalı');
+  assert.ok(!bodyText.includes('H0 Korundu'), '"H0 Korundu" ifadesi bulunmamalı');
 
-  // 2. "Lider Algoritma" ba┼şl─▒─ş─▒ yerine "De─şerlendirme Bulgusu" kullan─▒ld─▒─ş─▒n─▒ do─şrula
-  assert.ok(!bodyText.includes('Lider Algoritma:'), '"Lider Algoritma:" ifadesi kald─▒r─▒lm─▒┼ş olmal─▒');
-  assert.ok(bodyText.includes('De─şerlendirme Bulgusu:'), '"De─şerlendirme Bulgusu:" ba┼şl─▒─ş─▒ yer almal─▒');
+  // 2. "Lider Algoritma" başlığı yerine "Değerlendirme Bulgusu" kullanıldığını doğrula
+  assert.ok(!bodyText.includes('Lider Algoritma:'), '"Lider Algoritma:" ifadesi kaldırılmış olmalı');
+  assert.ok(bodyText.includes('Değerlendirme Bulgusu:'), '"Değerlendirme Bulgusu:" başlığı yer almalı');
 
-  // 3. EDF'nin ko┼şulsuz kazanan olmad─▒─ş─▒n─▒, dengeli de─şerlendirme metnini do─şrula
+  // 3. EDF'nin koşulsuz kazanan olmadığını, dengeli değerlendirme metnini doğrula
   assert.ok(
-    bodyText.includes('Bu de─şerlendirmede EDF baz─▒ kapasite d├╝zeylerinde y├╝ksek hedef kar┼ş─▒lama sonu├ğlar─▒ vermi┼ştir'),
-    'Dengeli EDF de─şerlendirme a├ğ─▒klamas─▒ bulunmal─▒'
+    bodyText.includes('Bu değerlendirmede EDF bazı kapasite düzeylerinde yüksek hedef karşılama sonuçları vermiştir'),
+    'Dengeli EDF değerlendirme açıklaması bulunmalı'
   );
   assert.ok(
-    !bodyText.includes('EDF t├╝m k─▒s─▒t d├╝zeylerinde en y├╝ksek ba┼şar─▒y─▒ elde etmi┼ştir'),
-    'Ko┼şulsuz ├╝st├╝nl├╝k iddias─▒ yer almamal─▒'
-  );
-});
-
-test('3. Ger├ğek Chrome: ├ûrneklem mutabakat─▒ (5.315, 5.207, 108 ve 11.911) do─şrulanmal─▒', { timeout: 15000 }, async () => {
-  const bodyText = await page.innerText('main');
-
-  // 1. Do─şrulama oturumu
-  assert.ok(bodyText.includes('5.315'), '5.315 do─şrulama oturumu say─▒s─▒ bulunmal─▒');
-
-  // 2. Sim├╝lasyon oturumu
-  assert.ok(bodyText.includes('5.207'), '5.207 sim├╝lasyon oturumu say─▒s─▒ bulunmal─▒');
-
-  // 3. Protokol filtresi fark─▒
-  assert.ok(bodyText.includes('108'), '108 protokol filtresi fark─▒ bulunmal─▒');
-
-  // 4. D├Ânemler aras─▒ test k├╝mesi (11.911 oturum, 148 g├╝n)
-  assert.ok(bodyText.includes('11.911'), '11.911 test oturumu say─▒s─▒ bulunmal─▒');
-  assert.ok(bodyText.includes('148'), '148 g├╝n say─▒s─▒ bulunmal─▒');
-
-  // 5. Veri kayb─▒ de─şil protokol filtresi oldu─şu a├ğ─▒klamas─▒
-  assert.ok(
-    bodyText.includes('Bu durum bir veri kayb─▒ de─şil') || bodyText.includes('108 oturumluk fark veri kayb─▒ de─şil'),
-    'Protokol filtresi gerek├ğesi a├ğ─▒klanm─▒┼ş olmal─▒'
+    !bodyText.includes('EDF tüm kısıt düzeylerinde en yüksek başarıyı elde etmiştir'),
+    'Koşulsuz üstünlük iddiası yer almamalı'
   );
 });
 
-test('4. Ger├ğek Chrome: Ke┼şifsel EDF sat─▒r─▒ (+0,38 y.p.) ile ├Ânkay─▒tl─▒ ana hipotez karar─▒ ayr─▒lmal─▒ ve Olas─▒ A├ğ─▒klama dili kullan─▒lmal─▒', { timeout: 15000 }, async () => {
+test('3. Gerçek Chrome: Örneklem mutabakatı (5.315, 5.207, 108 ve 11.911) doğrulanmalı', { timeout: 15000 }, async () => {
   const bodyText = await page.innerText('main');
 
-  // 1. ├ûnkay─▒tl─▒ ana hipotez sat─▒rlar─▒ i├ğin a├ğ─▒k etiket
+  // 1. Doğrulama oturumu
+  assert.ok(bodyText.includes('5.315'), '5.315 doğrulama oturumu sayısı bulunmalı');
+
+  // 2. Simülasyon oturumu
+  assert.ok(bodyText.includes('5.207'), '5.207 simülasyon oturumu sayısı bulunmalı');
+
+  // 3. Protokol filtresi farkı
+  assert.ok(bodyText.includes('108'), '108 protokol filtresi farkı bulunmalı');
+
+  // 4. Dönemler arası test kümesi (11.911 oturum, 148 gün)
+  assert.ok(bodyText.includes('11.911'), '11.911 test oturumu sayısı bulunmalı');
+  assert.ok(bodyText.includes('148'), '148 gün sayısı bulunmalı');
+
+  // 5. Veri kaybı değil protokol filtresi olduğu açıklaması
   assert.ok(
-    bodyText.includes('├ûnkay─▒tl─▒ Hipotez Desteklenmedi'),
-    'Ana hipotez sat─▒rlar─▒ "├ûnkay─▒tl─▒ Hipotez Desteklenmedi" olarak etiketlenmeli'
+    bodyText.includes('Bu durum bir veri kaybı değil') || bodyText.includes('108 oturumluk fark veri kaybı değil'),
+    'Protokol filtresi gerekçesi açıklanmış olmalı'
+  );
+});
+
+test('4. Gerçek Chrome: Keşifsel EDF satırı (+0,38 y.p.) ile önkayıtlı ana hipotez kararı ayrılmalı ve Olası Açıklama dili kullanılmalı', { timeout: 15000 }, async () => {
+  const bodyText = await page.innerText('main');
+
+  // 1. Önkayıtlı ana hipotez satırları için açık etiket
+  assert.ok(
+    bodyText.includes('Önkayıtlı Hipotez Desteklenmedi'),
+    'Ana hipotez satırları "Önkayıtlı Hipotez Desteklenmedi" olarak etiketlenmeli'
   );
 
-  // 2. f=0.9 EDF (+0,38 y.p.) ke┼şifsel sat─▒r─▒ i├ğin "Ke┼şifsel bulgu" etiketi
+  // 2. f=0.9 EDF (+0,38 y.p.) keşifsel satırı için "Keşifsel bulgu" etiketi
   assert.ok(
-    bodyText.includes('Ke┼şifsel bulgu (GA > 0; ana hipotez d─▒┼ş─▒)'),
-    'G├╝ven aral─▒─ş─▒ s─▒f─▒r─▒n ├╝zerinde olan ke┼şifsel EDF sat─▒r─▒ "Ke┼şifsel bulgu (GA > 0; ana hipotez d─▒┼ş─▒)" olarak ayr─▒lmal─▒'
+    bodyText.includes('Keşifsel bulgu (GA > 0; ana hipotez dışı)'),
+    'Güven aralığı sıfırın üzerinde olan keşifsel EDF satırı "Keşifsel bulgu (GA > 0; ana hipotez dışı)" olarak ayrılmalı'
   );
 
-  // 3. Kesin "Fiziksel Mekanizma:" yerine "G├Âzlenen Davran─▒┼ş ─░├ğin Olas─▒ A├ğ─▒klama (├çal─▒┼şma Hipotezi):" kullan─▒lmal─▒
+  // 3. Kesin "Fiziksel Mekanizma:" yerine "Gözlenen Davranış İçin Olası Açıklama (Çalışma Hipotezi):" kullanılmalı
   assert.ok(
     !bodyText.includes('Fiziksel Mekanizma:'),
-    'Kesin nedensellik ima eden "Fiziksel Mekanizma:" ba┼şl─▒─ş─▒ kald─▒r─▒lm─▒┼ş olmal─▒'
+    'Kesin nedensellik ima eden "Fiziksel Mekanizma:" başlığı kaldırılmış olmalı'
   );
   assert.ok(
-    bodyText.includes('G├Âzlenen Davran─▒┼ş ─░├ğin Olas─▒ A├ğ─▒klama (├çal─▒┼şma Hipotezi):'),
-    '"G├Âzlenen Davran─▒┼ş ─░├ğin Olas─▒ A├ğ─▒klama (├çal─▒┼şma Hipotezi):" ba┼şl─▒─ş─▒ yer almal─▒'
+    bodyText.includes('Gözlenen Davranış İçin Olası Açıklama (Çalışma Hipotezi):'),
+    '"Gözlenen Davranış İçin Olası Açıklama (Çalışma Hipotezi):" başlığı yer almalı'
   );
 });

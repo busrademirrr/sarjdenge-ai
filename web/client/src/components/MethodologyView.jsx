@@ -1,68 +1,68 @@
-﻿import React from 'react';
-import { BookOpen, CheckCircle2, AlertCircle, ShieldCheck, Cpu, GitCommit } from 'lucide-react';
+import React from 'react';
+import { BookOpen, CheckCircle2, AlertCircle, ShieldCheck, Cpu, GitCommit, Info } from 'lucide-react';
 
 const CONCEPTS = [
   {
     id: 'yp-vs-pct',
     icon: CheckCircle2,
     iconColor: 'text-emerald-700',
-    title: 'Y├╝zde (%) ile Y├╝zde Puan─▒ (y.p.) Ayr─▒m─▒',
+    title: 'Yüzde (%) ile Yüzde Puanı (y.p.) Ayrımı',
     summary:
-      '─░ki ba┼şar─▒ oran─▒ aras─▒ndaki do─şrudan aritmetik fark y├╝zde puan─▒ (y.p.) ile ifade edilir; ├Ânkay─▒tl─▒ hipotez e┼şi─şimiz mutlak ╬ö ÔëÑ +2,00 y.p. olarak tan─▒mlanm─▒┼şt─▒r.',
+      'İki başarı oranı arasındaki doğrudan aritmetik fark yüzde puanı (y.p.) ile ifade edilir; önkayıtlı hipotez eşiğimiz mutlak Δ ≥ +2,00 y.p. olarak tanımlanmıştır.',
     details: [
-      'Y├╝zde Puan─▒ (y.p.): ├ûrne─şin %90 ba┼şar─▒dan %92 ba┼şar─▒ya ├ğ─▒k─▒┼ş tam olarak +2,00 y.p. mutlak art─▒┼şt─▒r.',
-      'G├Âreceli De─şi┼şim (%): Oran─▒n kendi ├╝zerindeki b├╝y├╝me y├╝zdesidir (%90ÔÇÖdan %92ÔÇÖye ├ğ─▒k─▒┼ş g├Âreceli %2,22 b├╝y├╝medir).',
-      '├ûnkay─▒t Kural─▒: Ba┼şar─▒ ├Âl├ğ├╝t├╝ ╬ö ÔëÑ +2,00 y.p. ve %95 g├╝ven aral─▒─ş─▒ alt s─▒n─▒r─▒n─▒n 0 ├╝zerinde olmas─▒d─▒r.',
+      'Yüzde Puanı (y.p.): Örneğin %90 başarıdan %92 başarıya çıkış tam olarak +2,00 y.p. mutlak artıştır.',
+      'Göreceli Değişim (%): Oranın kendi üzerindeki büyüme yüzdesidir (%90’dan %92’ye çıkış göreceli %2,22 büyümedir).',
+      'Önkayıt Kuralı: Başarı ölçütü Δ ≥ +2,00 y.p. ve %95 güven aralığı alt sınırının 0 üzerinde olmasıdır.',
     ],
   },
   {
     id: 'phantom-reservation',
     icon: AlertCircle,
     iconColor: 'text-amber-700',
-    title: 'Hayalet Kapasite Rezervasyonu (├çal─▒┼şma Hipotezi)',
+    title: 'Gözlenen Davranış İçin Olası Açıklama',
     summary:
-      'Konservatif q20 s├╝re ve q80 enerji tahminlerinin, LP-MPC ├ğ├Âz├╝c├╝s├╝nde erken ad─▒mlarda kapasiteyi belirli ara├ğlara ay─▒rarak di─şer ara├ğlar─▒n ┼şarj─▒n─▒ geciktirmi┼ş olabilece─şi de─şerlendirilmektedir.',
+      "Güvenli q80 hedefi oturumların yaklaşık %12'sinde (2020 holdout) gerçek ihtiyacın %95'inin altında kalıyor; kullanıcı beyanında bu oran %2,55. Dar kapasitede bu araçlar hedefe ulaşamıyor. Bu, gözlenen farkla uyumlu bir açıklamadır; nedensel olarak kanıtlanmamıştır.",
     details: [
-      'Model, erken ayr─▒lma riskine kar┼ş─▒ kal─▒┼ş s├╝resini k─▒sa (q20) ve enerji talebini y├╝ksek (q80) tahmin eder.',
-      'LP-MPC ├ğ├Âz├╝c├╝s├╝ bu varsay─▒lan aciliyeti kar┼ş─▒lamak i├ğin erken ad─▒mlarda kapasiteyi belirli ara├ğlara y├Ânlendirir.',
-      'Bu a├ğ─▒klama kan─▒tlanm─▒┼ş nedensellik de─şil, sim├╝lasyon bulgular─▒yla uyumlu bir ├ğal─▒┼şma hipotezidir.',
+      "Güvenli q80 hedefi oturumların yaklaşık %12'sinde (2020 holdout) gerçek ihtiyacın %95'inin altında kalmaktadır.",
+      "Kullanıcı beyanında bu oran yalnızca %2,55 seviyesindedir.",
+      "Dar kapasitede bu araçlar hedefe ulaşamamakta olup bu durum gözlenen farkla uyumlu bir açıklamadır; nedensel olarak kanıtlanmamıştır.",
     ],
   },
   {
     id: 'edf-dynamics',
     icon: Cpu,
     iconColor: 'text-emerald-700',
-    title: 'EDF Algoritmas─▒n─▒n ├çal─▒┼şma Dinamikleri',
+    title: 'EDF Algoritmasının Çalışma Dinamikleri',
     summary:
-      'EDF (En Erken Ayr─▒l─▒┼ş ├ûncelikli), her 15 dakikal─▒k ad─▒mda prize ba─şl─▒ ara├ğlar─▒ ayr─▒l─▒┼ş terminine g├Âre s─▒ralar ve mevcut kapasiteyi gelecek ad─▒mlara rezervasyon kilitlemeden anl─▒k da─ş─▒t─▒r.',
+      'EDF (En Erken Ayrılış Öncelikli), her 15 dakikalık adımda prize bağlı araçları ayrılış terminine göre sıralar ve mevcut kapasiteyi gelecek adımlara rezervasyon kilitlemeden anlık dağıtır.',
     details: [
-      'Ayr─▒l─▒┼ş─▒ en yak─▒n araca g├╝c├╝ an─▒nda verir, artan g├╝c├╝ s─▒radaki araca devreder.',
-      'Bu de─şerlendirmede EDF baz─▒ kapasite d├╝zeylerinde y├╝ksek hedef kar┼ş─▒lama sonu├ğlar─▒ vermi┼ştir.',
-      'Algoritmalar─▒n performans─▒ kapasite d├╝zeyine ve kullan─▒lan metri─şe g├Âre kar┼ş─▒la┼şt─▒r─▒lmal─▒d─▒r.',
+      'Ayrılışı en yakın araca gücü anında verir, artan gücü sıradaki araca devreder.',
+      'Bu değerlendirmede EDF bazı kapasite düzeylerinde yüksek hedef karşılama sonuçları vermiştir.',
+      'Algoritmaların performansı kapasite düzeyine ve kullanılan metriğe göre karşılaştırılmalıdır.',
     ],
   },
   {
     id: 'data-separation',
     icon: ShieldCheck,
     iconColor: 'text-emerald-700',
-    title: 'Ger├ğek Saha Verisi vs. Sentetik Model Ayr─▒m─▒',
+    title: 'Gerçek Saha Verisi vs. Sentetik Model Ayrımı',
     summary:
-      'ACN-Data (Caltech ve JPL) ger├ğek saha telemetrisi ile T├╝rkiye apartman/i┼şyeri otoparklar─▒ i├ğin kurgulanan parametrik sentetik senaryolar birbirinden kesin olarak ayr─▒lm─▒┼şt─▒r.',
+      'ACN-Data (Caltech ve JPL) gerçek saha telemetrisi ile Türkiye apartman/işyeri otoparkları için kurgulanan parametrik sentetik senaryolar birbirinden kesin olarak ayrılmıştır.',
     details: [
-      'Ger├ğek Saha Verisi: Caltech ve JPL sahalar─▒ndaki 2019 ACN-Data ├Âl├ğ├╝mleridir (do─şrulama protokol├╝nde 68 g├╝n, 5.207 oturum).',
-      'Sentetik Konut/─░┼şyeri Modeli: config/senaryolar.yaml i├ğindeki m├╝hendislik ve modelleme varsay─▒mlar─▒yla (tipik 11/22 kW AC g├╝├ğ ve g├╝nl├╝k s├╝r├╝┼ş enerjisi parametreleriyle) kurgulanan sim├╝lasyondur; resm├« kurum istatisti─şi de─şildir.',
+      'Gerçek Saha Verisi: Caltech ve JPL sahalarındaki 2019 ACN-Data ölçümleridir (doğrulama protokolünde 68 gün-saha, 5.207 oturum).',
+      'Sentetik Konut/İşyeri Modeli: config/senaryolar.yaml içindeki mühendislik ve modelleme varsayımlarıyla (azami 6,66 kW [sim.PMAX, 208 V, 32 A] soket gücü ve günlük sürüş enerjisi parametreleriyle) kurgulanan simülasyondur; resmî kurum istatistiği değildir.',
     ],
   },
   {
     id: 'live-vs-offline',
     icon: GitCommit,
     iconColor: 'text-emerald-700',
-    title: 'Canl─▒ Kuantil Baseline vs. ├çevrimd─▒┼ş─▒ ML Modelleri',
+    title: 'Canlı Kuantil Baseline vs. Çevrimdışı ML Modelleri',
     summary:
-      'Canl─▒ sim├╝lasyon aray├╝z├╝nde ampirik beyan oran─▒ kuantilleri (q20 s├╝re, q80 enerji) ve HiGHS LP-MPC ├ğ├Âz├╝c├╝s├╝ ├ğal─▒┼ş─▒rken; ├ğevrimd─▒┼ş─▒ deney hatt─▒nda HGB/GBR kuantil regresyon modelleri de─şerlendirilmi┼ştir.',
+      'Canlı simülasyon arayüzünde ampirik beyan oranı kuantilleri (q20 süre, q80 enerji) ve HiGHS LP-MPC çözücüsü çalışırken; çevrimdışı deney hattında HGB/GBR kuantil regresyon modelleri değerlendirilmiştir.',
     details: [
-      'Canl─▒ Web Servisi (sarjdenge/web_servis.py): 2019 H1 e─şitim kesitinden (7.808 oturum) ├Â─şrenilen sabit kuantil oranlar─▒ (q20 = 0,8889 s├╝re, q80 = 0,8446 enerji) kullan─▒l─▒r.',
-      '├çevrimd─▒┼ş─▒ Deney Hatt─▒ (tahmin.py, modeller.py): HistGradientBoostingRegressor ve GradientBoostingRegressor modelleri 5.315 do─şrulama oturumu ve 68 s─▒k─▒┼ş─▒k g├╝ndeki 5.207 sim├╝lasyon oturumu (fark: 108 oturum) ├╝zerinde test edilmi┼ştir.',
+      'Canlı Web Servisi (sarjdenge/web_servis.py): 2019 H1 eğitim kesitinden (7.808 oturum) öğrenilen sabit kuantil oranları (q20 = 0,8889 süre, q80 = 0,8446 enerji) kullanılır.',
+      'Çevrimdışı Deney Hattı (tahmin.py, modeller.py): HistGradientBoostingRegressor ve GradientBoostingRegressor modelleri 5.315 doğrulama oturumu ve 68 gün-sahadaki 5.207 simülasyon oturumu (fark: 108 oturum) üzerinde test edilmiştir.',
     ],
   },
 ];
@@ -70,6 +70,14 @@ const CONCEPTS = [
 export default function MethodologyView() {
   return (
     <div className="space-y-4">
+      {/* 22 Ekim Düzeltme Notu */}
+      <div className="bg-blue-50/80 border border-blue-200/90 rounded-xl p-3 sm:p-3.5 text-xs text-blue-900 flex items-center space-x-2.5 shadow-2xs">
+        <Info className="w-4 h-4 text-blue-700 shrink-0" />
+        <span className="font-medium">
+          22 Ekim 2026'da simülasyon girişinde indeksleme hatası bulundu ve düzeltildi; eski sonuçlar korunmuştur, yeniden hesaplanan sonuçlar burada gösterilmektedir.
+        </span>
+      </div>
+
       {/* Compact Header */}
       <div className="bg-white border border-slate-200/90 rounded-xl p-4 sm:p-5 shadow-2xs">
         <div className="flex items-center space-x-2.5">
@@ -78,10 +86,10 @@ export default function MethodologyView() {
           </div>
           <div>
             <h2 className="text-base font-bold text-slate-900">
-              Metodoloji & Terimler S├Âzl├╝─ş├╝
+              Metodoloji & Terimler Sözlüğü
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Model ├ğ─▒kt─▒lar─▒, hipotez testleri ve sim├╝lasyon kavramlar─▒n─▒n ├Âzet referans k─▒lavuzu
+              Model çıktıları, hipotez testleri ve simülasyon kavramlarının özet referans kılavuzu
             </p>
           </div>
         </div>
@@ -110,8 +118,8 @@ export default function MethodologyView() {
 
               <details className="mt-3 pt-2.5 border-t border-slate-100 group text-xs text-slate-600">
                 <summary className="font-semibold text-emerald-800 hover:text-emerald-900 cursor-pointer flex items-center justify-between list-none">
-                  <span>Ayr─▒nt─▒l─▒ A├ğ─▒klama</span>
-                  <span className="text-slate-400 group-open:rotate-180 transition-transform">Ôû¥</span>
+                  <span>Ayrıntılı Açıklama</span>
+                  <span className="text-lg text-slate-400 group-open:rotate-180 transition-transform inline-block leading-none select-none">▾</span>
                 </summary>
                 <ul className="mt-2 space-y-1.5 text-slate-600 leading-relaxed list-disc pl-4">
                   {item.details.map((line, idx) => (

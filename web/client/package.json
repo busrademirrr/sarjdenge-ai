@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "sarjdenge-client",
   "version": "1.0.0",
   "private": true,
@@ -10,11 +10,9 @@
     "test:e2e": "node --test tests/toast.e2e.test.js",
     "test:advisor:e2e": "node --test tests/advisor.e2e.test.js",
     "test:hypothesis:e2e": "node --test tests/hypothesis.e2e.test.js",
-    "test:auth:e2e": "node --test tests/auth.e2e.test.js",
-    "test:all:e2e": "node --test tests/toast.e2e.test.js tests/advisor.e2e.test.js tests/hypothesis.e2e.test.js tests/auth.e2e.test.js"
+    "test:all:e2e": "node --test tests/toast.e2e.test.js tests/advisor.e2e.test.js tests/hypothesis.e2e.test.js"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.118.0",
     "lucide-react": "^1.16.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

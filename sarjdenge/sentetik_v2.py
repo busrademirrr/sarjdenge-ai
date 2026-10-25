@@ -36,8 +36,10 @@ def senaryo_yapilandirmasi_yukle(
     yol = pathlib.Path(config_yolu or VARSAYILAN_CONFIG_YOLU)
     if not yol.exists():
         raise FileNotFoundError(f"Senaryo yapılandırma dosyası bulunamadı: {yol}")
-    with open(yol, "r", encoding="utf-8") as f:
+    with open(yol, "r", encoding="utf-8-sig") as f:
         cfg = yaml.safe_load(f)
+    if not isinstance(cfg, dict):
+        raise ValueError(f"Senaryo yapılandırma dosyası geçersiz şema içeriyor: {yol}")
     return cfg
 
 
@@ -184,6 +186,8 @@ def uret(
     acn_df = pd.DataFrame()
     if p.get("kalibrasyon_tipi") in ["ACN_AMPIRIK", "HIBRIT"]:
         acn_df = acn_ampirik_veri_havuzu()
+
+    acn_kalibre_oldu = bool(senaryo_id == "isyeri_gunduz" and len(acn_df) > 50)
 
     baslangic = pd.Timestamp(baslangic_tarihi, tz=tz_str)
     satirlar = []
@@ -353,6 +357,7 @@ def uret(
             sid += 1
 
     df_sonuc = pd.DataFrame(satirlar)
+    df_sonuc.attrs["acn_kalibrasyonu"] = acn_kalibre_oldu
     if yol is not None:
         yol_p = pathlib.Path(yol)
         yol_p.parent.mkdir(parents=True, exist_ok=True)

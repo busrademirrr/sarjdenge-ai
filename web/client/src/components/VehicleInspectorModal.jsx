@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { X, HelpCircle, Clock, Zap } from 'lucide-react';
 import { formatTimeHour, formatPercent, formatKwh } from '../utils/formatters.js';
 import { ALGORITHM_META } from '../utils/algorithmMeta.js';
@@ -33,20 +33,20 @@ export default function VehicleInspectorModal({ vehicle, onClose }) {
           <div>
             <div className="flex items-center space-x-2">
               <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 font-semibold">
-                S─▒ra #{vehicle.sira}
+                Sıra #{vehicle.sira}
               </span>
               <h3 className="text-base sm:text-lg font-bold text-slate-900 flex items-center space-x-2">
-                <span>Ara├ğ: {vehicle.arac_id}</span>
+                <span>Araç: {vehicle.arac_id}</span>
                 {vehicle.erken_ayrildi && (
                   <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-semibold flex items-center space-x-1">
                     <Clock className="w-3 h-3 text-amber-600" />
-                    <span>Erken Ayr─▒ld─▒</span>
+                    <span>Erken Ayrıldı</span>
                   </span>
                 )}
               </h3>
             </div>
             <p className="text-xs text-slate-500 mt-1 font-mono">
-              Kullan─▒c─▒ ID: {vehicle.kullanici_id} ÔÇó Giri┼ş: {girisFmt} ÔÇó ├ç─▒k─▒┼ş: {ayrilFmt}
+              Kullanıcı ID: {vehicle.kullanici_id} • Giriş: {girisFmt} • Çıkış: {ayrilFmt}
             </p>
           </div>
 
@@ -61,15 +61,15 @@ export default function VehicleInspectorModal({ vehicle, onClose }) {
         {/* Telemetry Comparison Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 my-4">
           <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-            <span className="text-xs text-slate-600 uppercase block font-semibold">Ger├ğek Talep</span>
+            <span className="text-xs text-slate-600 uppercase block font-semibold">Gerçek Talep</span>
             <span className="text-base font-bold text-slate-900 font-mono">{formatKwh(vehicle.talep_gercek_kwh)}</span>
             <span className="text-xs text-slate-600 block mt-0.5">
-              Kal─▒┼ş: {vehicle.sure_gercek_dk} dk ({(Number(vehicle.sure_gercek_dk) / 60).toFixed(1).replace('.', ',')} sa)
+              Kalış: {vehicle.sure_gercek_dk} dk ({(Number(vehicle.sure_gercek_dk) / 60).toFixed(1).replace('.', ',')} sa)
             </span>
           </div>
 
           <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-            <span className="text-xs text-slate-600 uppercase block font-semibold">Kullan─▒c─▒ Beyan─▒</span>
+            <span className="text-xs text-slate-600 uppercase block font-semibold">Kullanıcı Beyanı</span>
             <span className="text-base font-bold text-amber-800 font-mono">{formatKwh(vehicle.talep_beyan_kwh)}</span>
             <span className="text-xs text-slate-600 block mt-0.5">
               Beyan: {vehicle.sure_beyan_dk} dk ({(Number(vehicle.sure_beyan_dk) / 60).toFixed(1).replace('.', ',')} sa)
@@ -77,7 +77,7 @@ export default function VehicleInspectorModal({ vehicle, onClose }) {
           </div>
 
           <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-            <span className="text-xs text-slate-600 uppercase block font-semibold">Tahmin (q20 S├╝re)</span>
+            <span className="text-xs text-slate-600 uppercase block font-semibold">Tahmin (q20 Süre)</span>
             <span className="text-base font-bold text-emerald-800 font-mono">
               {vehicle.sure_tahmin_q20_dk} dk ({(Number(vehicle.sure_tahmin_q20_dk) / 60).toFixed(1).replace('.', ',')} sa)
             </span>
@@ -96,7 +96,7 @@ export default function VehicleInspectorModal({ vehicle, onClose }) {
         {/* Algorithm Delivery Table */}
         <div className="mb-4">
           <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-            Algoritma Bazl─▒ Teslim Edilen Enerji ve Kar┼ş─▒lama
+            Algoritma Bazlı Teslim Edilen Enerji ve Karşılama
           </h4>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 tabular-nums">
             {[
@@ -125,7 +125,7 @@ export default function VehicleInspectorModal({ vehicle, onClose }) {
                   <div className="flex items-baseline justify-between mt-1.5">
                     <span className="font-bold text-slate-900">{formatKwh(delivered)}</span>
                     <span className={`text-xs font-bold ${isOk ? 'text-emerald-800' : 'text-amber-800'}`}>
-                      {isOk ? 'Ô£ô ' : '! '}
+                      {isOk ? '✓ ' : '! '}
                       {formatPercent(ratio, 0, true)}
                     </span>
                   </div>
@@ -140,16 +140,21 @@ export default function VehicleInspectorModal({ vehicle, onClose }) {
           <div className="flex items-center space-x-2">
             <HelpCircle className="w-4 h-4 text-emerald-700" />
             <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-              Olas─▒ Mekanizma ve Karar A├ğ─▒klamas─▒ (Explainability)
+              Olası Mekanizma ve Karar Açıklaması (Explainability)
             </h4>
           </div>
 
           <div className="space-y-2">
             {vehicle.neden_analizi?.nedenler?.map((n, i) => {
-              const cleanTitle = n.baslik?.replace(
-                'Hayalet Kapasite Rezervasyonu',
-                'Hayalet Kapasite Rezervasyonu (├çal─▒┼şma Hipotezi)'
-              );
+              const cleanTitle = n.baslik
+                ?.replace(
+                  'Hayalet Kapasite Rezervasyonu (Çalışma Hipotezi)',
+                  'Gözlenen Davranış İçin Olası Açıklama'
+                )
+                ?.replace(
+                  'Hayalet Kapasite Rezervasyonu',
+                  'Gözlenen Davranış İçin Olası Açıklama'
+                );
 
               return (
                 <div

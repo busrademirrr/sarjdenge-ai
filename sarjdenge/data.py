@@ -1,4 +1,4 @@
-﻿"""ACN-Data oturumlar─▒n─▒ y├╝kle, temizle, ├Âzellik ├╝ret."""
+"""ACN-Data oturumlarını yükle, temizle, özellik üret."""
 import heapq
 
 import numpy as np
@@ -10,14 +10,14 @@ TZ = "America/Los_Angeles"
 def yukle(csv_yolu, min_sure_dk=30, min_kwh=0.5, max_sure_saat=48, max_gecikme_dk=30):
     df = pd.read_csv(csv_yolu, dtype={"siteID": str})
     ilk = "requestedDeparture_ilk" in df.columns
-    if ilk:  # ba─şlant─▒ an─▒na en yak─▒n (ilk) kullan─▒c─▒ girdisini beyan olarak kullan
+    if ilk:  # bağlantı anına en yakın (ilk) kullanıcı girdisini beyan olarak kullan
         for ad in ["requestedDeparture", "kWhRequested", "minutesAvailable"]:
             if ad in df.columns:
                 df[ad + "_son"] = df[ad]
             if ad + "_ilk" in df.columns:
                 df[ad] = df[ad + "_ilk"]
     else:
-        print("UYARI: CSV'de ilk girdi s├╝tunlar─▒ yok; beyan = son girdi (s─▒z─▒nt─▒ riski). acn_veri_cek.py ile yeniden ├ğekin.")
+        print("UYARI: CSV'de ilk girdi sütunları yok; beyan = son girdi (sızıntı riski). acn_veri_cek.py ile yeniden çekin.")
     for c in ["connectionTime", "disconnectTime", "requestedDeparture"]:
         if c in df.columns:
             df[c] = pd.to_datetime(df[c], utc=True, errors="coerce")
@@ -34,23 +34,23 @@ def yukle(csv_yolu, min_sure_dk=30, min_kwh=0.5, max_sure_saat=48, max_gecikme_d
     else:
         df["userID"] = "anon"
     df["beyan_var"] = df.requestedDeparture.notna() & df.kWhRequested.notna()
-    if ilk and "girdi_gecikme_dk" in df.columns and df.girdi_gecikme_dk.notna().any():  # beyan ba─şlant─▒dan en ge├ğ 30 dk sonra girildiyse "ba─şlant─▒ an─▒nda bilinen" say
+    if ilk and "girdi_gecikme_dk" in df.columns and df.girdi_gecikme_dk.notna().any():  # beyan bağlantıdan en geç 30 dk sonra girildiyse "bağlantı anında bilinen" say
         df["beyan_var"] &= df.girdi_gecikme_dk.between(-5, max_gecikme_dk)
     elif ilk:
-        print("UYARI: girdi zaman─▒ (modifiedAt) yok; gecikme filtresi uygulanamad─▒.")
+        print("UYARI: girdi zamanı (modifiedAt) yok; gecikme filtresi uygulanamadı.")
     return df
 
 
 def kullanici_gecmisi_hesapla(df: pd.DataFrame):
-    """Her oturum i├ğin yaln─▒zca o oturumun connectionTime an─▒ndan ├Ânce tamamlanm─▒┼ş
-    (disconnectTime <= connectionTime) ayn─▒ kullan─▒c─▒ oturumlar─▒ndan ge├ğmi┼ş ├Âzetini hesaplar.
+    """Her oturum için yalnızca o oturumun connectionTime anından önce tamamlanmış
+    (disconnectTime <= connectionTime) aynı kullanıcı oturumlarından geçmiş özetini hesaplar.
 
     Kurallar:
-    - userID == 'anon' (veya eksik/bo┼ş) olan kay─▒tlar aras─▒nda ge├ğmi┼ş olu┼şturulmaz.
-    - Mevcut oturumun veya ayn─▒ connectionTime an─▒nda ba┼şlayan e┼şzamanl─▒ oturumlar─▒n
-      hedef de─şerleri (sure_dk, kWhDelivered) kendi ├Âzelliklerine dahil edilmez.
-    - Hemen ├Ânceki oturum ├ğak─▒┼şsa bile (disconnectTime > connectionTime), daha eski
-      tamamlanm─▒┼ş oturumlar (disconnectTime <= connectionTime) ge├ğmi┼ş ortalamas─▒na dahil edilir.
+    - userID == 'anon' (veya eksik/boş) olan kayıtlar arasında geçmiş oluşturulmaz.
+    - Mevcut oturumun veya aynı connectionTime anında başlayan eşzamanlı oturumların
+      hedef değerleri (sure_dk, kWhDelivered) kendi özelliklerine dahil edilmez.
+    - Hemen önceki oturum çakışsa bile (disconnectTime > connectionTime), daha eski
+      tamamlanmış oturumlar (disconnectTime <= connectionTime) geçmiş ortalamasına dahil edilir.
     """
     n_rows = len(df)
     arr_sure = np.full(n_rows, np.nan, dtype=float)
@@ -95,7 +95,7 @@ def kullanici_gecmisi_hesapla(df: pd.DataFrame):
         pos_valid = pos_list[valid_mask]
         c_vals = conn_ns[pos_valid]
 
-        # Deterministik s─▒ralama: ├Ânce connectionTime, e┼şitlikte orijinal pozisyon
+        # Deterministik sıralama: önce connectionTime, eşitlikte orijinal pozisyon
         order = np.lexsort((pos_valid, c_vals))
         ord_pos = pos_valid[order]
         ord_conn = c_vals[order]
@@ -117,14 +117,14 @@ def kullanici_gecmisi_hesapla(df: pd.DataFrame):
             while j < m and ord_conn[j] == t_conn:
                 j += 1
 
-            # 1. Bu ba─şlant─▒ an─▒ndan ├Ânce veya tam o anda tamamlanm─▒┼ş ├Ânceki oturumlar─▒ ge├ğmi┼şe ekle
+            # 1. Bu bağlantı anından önce veya tam o anda tamamlanmış önceki oturumları geçmişe ekle
             while bekleyen and bekleyen[0][0] <= t_conn:
                 _, s_val, k_val = heapq.heappop(bekleyen)
                 cum_sure += s_val
                 cum_kwh += k_val
                 cum_count += 1
 
-            # 2. Ayn─▒ connectionTime an─▒ndaki oturumlara mevcut ge├ğmi┼ş ortalamas─▒n─▒ ata
+            # 2. Aynı connectionTime anındaki oturumlara mevcut geçmiş ortalamasını ata
             if cum_count > 0:
                 ort_sure = cum_sure / cum_count
                 ort_kwh = cum_kwh / cum_count
@@ -134,7 +134,7 @@ def kullanici_gecmisi_hesapla(df: pd.DataFrame):
                     arr_sure[p] = ort_sure
                     arr_kwh[p] = ort_kwh
 
-            # 3. Bu gruptaki oturumlar─▒ kendi tamamlanma zamanlar─▒yla bekleyen kuyru─şuna ekle
+            # 3. Bu gruptaki oturumları kendi tamamlanma zamanlarıyla bekleyen kuyruğuna ekle
             for k in range(i, j):
                 if (
                     ord_disc_ok[k]
@@ -152,7 +152,7 @@ def kullanici_gecmisi_hesapla(df: pd.DataFrame):
 
 
 def ozellikler(df):
-    """Yaln─▒zca ba─şlant─▒ an─▒nda bilinen ├Âzellikler; ge├ğmi┼ş = ayn─▒ kullan─▒c─▒n─▒n tamamlanm─▒┼ş ├Ânceki oturumlar─▒."""
+    """Yalnızca bağlantı anında bilinen özellikler; geçmiş = aynı kullanıcının tamamlanmış önceki oturumları."""
     X = pd.DataFrame(index=df.index)
     yerel_giris = (
         df["yerel_giris"]

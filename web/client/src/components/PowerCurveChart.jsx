@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Activity } from 'lucide-react';
 import { formatKw } from '../utils/formatters.js';
 import { ALGORITHM_META } from '../utils/algorithmMeta.js';
@@ -8,6 +8,7 @@ export default function PowerCurveChart({ simulation }) {
 
   const [visibleSeries, setVisibleSeries] = useState({
     fcfs_beyan: true,
+    esit_beyan: true,
     edf_beyan: true,
     edf_tahmin_guvenli: true,
     mpc_beyan: true,
@@ -21,14 +22,17 @@ export default function PowerCurveChart({ simulation }) {
 
   const seriesMeta = [
     ALGORITHM_META.fcfs_beyan,
+    ALGORITHM_META.esit_beyan,
     ALGORITHM_META.edf_beyan,
     ALGORITHM_META.edf_tahmin_guvenli,
     ALGORITHM_META.mpc_beyan,
     ALGORITHM_META.mpc_tahmin_guvenli,
     ALGORITHM_META.mpc_hibrit_asimetrik,
-  ];
+  ].filter((s) => s && Array.isArray(simulation.yontem_profilleri?.[s.key]));
 
-  const timeLabels = simulation.zaman_etiketleri; // 96 steps
+  const timeLabels = simulation.zaman_etiketleri;
+  const totalSteps = Math.max(2, timeLabels.length);
+  const maxStepIdx = totalSteps - 1;
   const capLimit = simulation.kapasite_siniri_kw || 50;
   const unctrl = simulation.kontrolsuz_profil_kw || [];
 
@@ -47,7 +51,7 @@ export default function PowerCurveChart({ simulation }) {
   const graphWidth = svgWidth - padding.left - padding.right;
   const graphHeight = svgHeight - padding.top - padding.bottom;
 
-  const getX = (idx) => padding.left + (idx / 95) * graphWidth;
+  const getX = (idx) => padding.left + (idx / maxStepIdx) * graphWidth;
   const getY = (val) => padding.top + graphHeight - (val / maxY) * graphHeight;
 
   // Helper to generate SVG path
@@ -71,66 +75,81 @@ export default function PowerCurveChart({ simulation }) {
   } : null;
 
   return (
-    <section className="bg-white border border-slate-200/90 rounded-xl p-4 sm:p-5 mb-4 shadow-2xs" aria-label="24 Saatlik G├╝├ğ E─şrisi">
+    <section className="bg-white border border-slate-200/90 rounded-xl p-4 sm:p-5 mb-4 shadow-2xs" aria-label="24 Saatlik Güç Eğrisi">
       {/* Compact Header & Legend */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 mb-2.5">
         <div className="flex items-center space-x-2">
           <Activity className="w-4 h-4 text-emerald-700 shrink-0" />
           <h3 className="font-semibold text-sm sm:text-base text-slate-900">
-            24 Saatlik G├╝├ğ E─şrisi
+            24 Saatlik Güç Eğrisi
           </h3>
           <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-50 text-rose-800 border border-rose-200/80 tabular-nums">
             Tavan: {formatKw(capLimit)}
           </span>
         </div>
 
-        {/* Compact Legend Toggles */}
-        <div className="flex items-center flex-wrap gap-1.5 text-[11px]">
-          {seriesMeta.map((s) => {
-            const isVis = visibleSeries[s.key];
-            return (
-              <button
-                key={s.key}
-                type="button"
-                onClick={() => toggleSeries(s.key)}
-                aria-pressed={isVis}
-                className={`flex items-center space-x-1.5 px-2 py-0.5 rounded-md border transition whitespace-nowrap ${
-                  isVis
-                    ? 'bg-white border-slate-200/90 text-slate-800 font-medium shadow-2xs'
-                    : 'bg-slate-50 border-slate-200/60 text-slate-400 line-through'
-                }`}
-              >
-                <svg className="w-3 h-2 shrink-0" viewBox="0 0 16 8" aria-hidden="true">
-                  <line
-                    x1="0"
-                    y1="4"
-                    x2="16"
-                    y2="4"
-                    stroke={s.color}
-                    strokeWidth="2.5"
-                    strokeDasharray={s.dashArray === 'none' ? undefined : s.dashArray}
-                  />
-                </svg>
-                <span>{s.shortName}</span>
-              </button>
-            );
-          })}
-          <button
-            type="button"
-            onClick={() => toggleSeries('kontrolsuz')}
-            aria-pressed={visibleSeries.kontrolsuz}
-            className={`flex items-center space-x-1.5 px-2 py-0.5 rounded-md border transition whitespace-nowrap ${
-              visibleSeries.kontrolsuz
-                ? 'bg-white border-slate-200/90 text-slate-700 font-medium shadow-2xs'
-                : 'bg-slate-50 border-slate-200/60 text-slate-400 line-through'
-            }`}
-          >
-            <svg className="w-3 h-2 shrink-0" viewBox="0 0 16 8" aria-hidden="true">
-              <line x1="0" y1="4" x2="16" y2="4" stroke="#64748b" strokeWidth="2" strokeDasharray="3 3" />
-            </svg>
-            <span>Kontrols├╝z</span>
-          </button>
-        </div>
+          {/* Compact Legend Toggles */}
+          <div className="flex items-center flex-wrap gap-1.5 text-[11px]">
+            {seriesMeta.map((s) => {
+              const isVis = visibleSeries[s.key];
+              return (
+                <button
+                  key={s.key}
+                  type="button"
+                  onClick={() => toggleSeries(s.key)}
+                  aria-pressed={isVis}
+                  className={`flex items-center space-x-1.5 px-2 py-0.5 rounded-md border transition whitespace-nowrap ${
+                    isVis
+                      ? 'bg-white border-slate-200/90 text-slate-800 font-medium shadow-2xs'
+                      : 'bg-slate-50 border-slate-200/60 text-slate-400 line-through'
+                  }`}
+                >
+                  <svg className="w-3 h-2 shrink-0" viewBox="0 0 16 8" aria-hidden="true">
+                    <line
+                      x1="0"
+                      y1="4"
+                      x2="16"
+                      y2="4"
+                      stroke={s.color}
+                      strokeWidth="2.5"
+                      strokeDasharray={s.dashArray === 'none' ? undefined : s.dashArray}
+                    />
+                  </svg>
+                  <span>{s.shortName}</span>
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              onClick={() => toggleSeries('kontrolsuz')}
+              aria-pressed={visibleSeries.kontrolsuz}
+              className={`flex items-center space-x-1.5 px-2 py-0.5 rounded-md border transition whitespace-nowrap ${
+                visibleSeries.kontrolsuz
+                  ? 'bg-white border-slate-200/90 text-slate-700 font-medium shadow-2xs'
+                  : 'bg-slate-50 border-slate-200/60 text-slate-400 line-through'
+              }`}
+            >
+              <svg className="w-3 h-2 shrink-0" viewBox="0 0 16 8" aria-hidden="true">
+                <line x1="0" y1="4" x2="16" y2="4" stroke="#64748b" strokeWidth="2" strokeDasharray="3 3" />
+              </svg>
+              <span>Kontrolsüz</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => toggleSeries('kapasite')}
+              aria-pressed={visibleSeries.kapasite}
+              className={`flex items-center space-x-1.5 px-2 py-0.5 rounded-md border transition whitespace-nowrap ${
+                visibleSeries.kapasite
+                  ? 'bg-white border-slate-200/90 text-rose-800 font-medium shadow-2xs'
+                  : 'bg-slate-50 border-slate-200/60 text-slate-400 line-through'
+              }`}
+            >
+              <svg className="w-3 h-2 shrink-0" viewBox="0 0 16 8" aria-hidden="true">
+                <line x1="0" y1="4" x2="16" y2="4" stroke="#be123c" strokeWidth="2.2" strokeDasharray="6 4" />
+              </svg>
+              <span>Tavan</span>
+            </button>
+          </div>
       </div>
 
       {/* SVG Interactive Chart */}
@@ -143,8 +162,8 @@ export default function PowerCurveChart({ simulation }) {
             const rect = e.currentTarget.getBoundingClientRect();
             const relX = (e.clientX - rect.left) * (svgWidth / rect.width);
             const clampedX = Math.max(padding.left, Math.min(padding.left + graphWidth, relX));
-            const step = Math.round(((clampedX - padding.left) / graphWidth) * 95);
-            setHoveredIdx(Math.max(0, Math.min(95, step)));
+            const step = Math.round(((clampedX - padding.left) / graphWidth) * maxStepIdx);
+            setHoveredIdx(Math.max(0, Math.min(maxStepIdx, step)));
           }}
         >
           {/* Horizontal Grid lines */}
@@ -175,9 +194,9 @@ export default function PowerCurveChart({ simulation }) {
             );
           })}
 
-          {/* Vertical Time Labels (Every 3 hours = 12 steps) */}
-          {Array.from({ length: 9 }).map((_, i) => {
-            const stepIdx = i * 12;
+          {/* Vertical Time Labels (Every 3 hours = 12 steps, adapted to dynamic horizon) */}
+          {Array.from({ length: Math.floor(maxStepIdx / 12) + 1 }).map((_, i) => {
+            const stepIdx = Math.min(maxStepIdx, i * 12);
             const x = getX(stepIdx);
             const label = timeLabels[stepIdx] || '';
             return (
@@ -281,20 +300,20 @@ export default function PowerCurveChart({ simulation }) {
           )}
         </svg>
 
-        {/* Hover Tooltip Box */}
+        {/* Hover Tooltip Box (Tavan rozetini örtmemek için dinamik konumlandırma) */}
         {activeHover && (
           <div
-            className="absolute top-2 right-4 bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-xl p-3 shadow-lg text-xs pointer-events-none transition-all z-10 tabular-nums"
+            className={`absolute ${hoveredIdx > maxStepIdx / 2 ? 'left-20 top-2' : 'right-4 top-10'} bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-xl p-3 shadow-lg text-xs pointer-events-none transition-all z-10 tabular-nums`}
             style={{ minWidth: '230px' }}
           >
             <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-100">
               <span className="font-bold text-slate-900">Saat: {activeHover.time}</span>
-              <span className="text-xs text-slate-500">15 dk Ad─▒m</span>
+              <span className="text-xs text-slate-500">15 dk Adım</span>
             </div>
 
             <div className="space-y-1">
               <div className="flex items-center justify-between text-slate-600">
-                <span>Kontrols├╝z Pik:</span>
+                <span>Kontrolsüz Pik:</span>
                 <span className="font-semibold text-slate-900">{formatKw(activeHover.unctrl)}</span>
               </div>
 

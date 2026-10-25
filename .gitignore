@@ -1,4 +1,4 @@
-﻿# Python caches and environments
+# Python caches and environments
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -45,3 +45,5 @@ env/
 /data/sentetik/
 /demo_veri.json
 /grafik.png
+/scratch/
+

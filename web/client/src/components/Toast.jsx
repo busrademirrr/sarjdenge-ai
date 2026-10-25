@@ -1,12 +1,12 @@
-﻿import React from 'react';
+import React from 'react';
 import { AlertCircle, RefreshCw, X } from 'lucide-react';
 
 export default function Toast({ toast, onClose, onRetry, retryLoading = false }) {
   if (!toast) return null;
 
   const {
-    title = 'Sim├╝lasyon Hatas─▒',
-    message = 'Bir hata olu┼ştu.',
+    title = 'Simülasyon Hatası',
+    message = 'Bir hata oluştu.',
     canRetry = true,
   } = toast;
 
@@ -50,7 +50,7 @@ export default function Toast({ toast, onClose, onRetry, retryLoading = false })
                 type="button"
                 onClick={onRetry}
                 disabled={retryLoading}
-                aria-label="Sim├╝lasyonu ayn─▒ parametrelerle yeniden dene"
+                aria-label="Simülasyonu aynı parametrelerle yeniden dene"
                 className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-1 ${
                   retryLoading
                     ? 'bg-rose-100 text-rose-400 border border-rose-200 cursor-not-allowed'
@@ -61,7 +61,7 @@ export default function Toast({ toast, onClose, onRetry, retryLoading = false })
                   className={`w-3.5 h-3.5 ${retryLoading ? 'animate-spin' : ''}`}
                   aria-hidden="true"
                 />
-                <span>{retryLoading ? 'Yeniden DeneniyorÔÇĞ' : 'Yeniden Dene'}</span>
+                <span>{retryLoading ? 'Yeniden Deneniyor…' : 'Yeniden Dene'}</span>
               </button>
 
               <button

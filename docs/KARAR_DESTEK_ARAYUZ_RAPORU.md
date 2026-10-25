@@ -1,117 +1,117 @@
-﻿# ┼ŞarjDenge AI ÔÇö ─░┼ş Paketi E-UI Tamamlama Raporu: Site Y├Âneticisi Karar Destek Aray├╝z├╝ ve Sonu├ğ Raporlamas─▒
+# ŞarjDenge AI — İş Paketi E-UI Tamamlama Raporu: Site Yöneticisi Karar Destek Arayüzü ve Sonuç Raporlaması
 
 **Tarih:** 17 Ekim 2026
-**Durum:** Tamamland─▒, Do─şruland─▒ ve Test Edildi (48/48 Python + 5/5 Node.js + 5/5 E2E Ba┼şar─▒l─▒)
-**Kapsam:** React + Tailwind CSS Frontend, Node.js Express API, Python ML/MPC Sim├╝lasyon K├Âpr├╝s├╝, A├ğ─▒klanabilirlik ("Neden?") Paneli, Bilimsel ┼Şeffafl─▒k Bildirimi
+**Durum:** Tamamlandı, Doğrulandı ve Test Edildi (48/48 Python + 5/5 Node.js + 5/5 E2E Başarılı)
+**Kapsam:** React + Tailwind CSS Frontend, Node.js Express API, Python ML/MPC Simülasyon Köprüsü, Açıklanabilirlik ("Neden?") Paneli, Bilimsel Şeffaflık Bildirimi
 
 ---
 
-## 1. Y├Ânetici ├ûzeti ve Mimari Genel Bak─▒┼ş
+## 1. Yönetici Özeti ve Mimari Genel Bakış
 
-─░┼ş Paketi E-UI kapsam─▒nda, daha ├Ânce ─░┼ş Paketi C (Quantile Regresyon ┼Şampiyon Modelleri) ve ─░┼ş Paketi D'de (E┼şle┼ştirilmi┼ş Bootstrap ve Hipotez Testi) elde edilen t├╝m ML ve MPC sim├╝lasyon ├ğ─▒kt─▒lar─▒ j├╝rinin ve site y├Âneticisinin do─şrudan deneyimleyebilece─şi, s─▒f─▒r kurulum engeli olan, profesyonel, mobil uyumlu ve bilimsel olarak ┼şeffaf bir web ├╝r├╝n├╝ne d├Ân├╝┼şt├╝r├╝lm├╝┼şt├╝r.
+İş Paketi E-UI kapsamında, daha önce İş Paketi C (Quantile Regresyon Şampiyon Modelleri) ve İş Paketi D'de (Eşleştirilmiş Bootstrap ve Hipotez Testi) elde edilen tüm ML ve MPC simülasyon çıktıları jürinin ve site yöneticisinin doğrudan deneyimleyebileceği, sıfır kurulum engeli olan, profesyonel, mobil uyumlu ve bilimsel olarak şeffaf bir web ürününe dönüştürülmüştür.
 
-### Mimari Bile┼şenler:
-1. **Frontend (Kullan─▒c─▒ Aray├╝z├╝):** React 18 + Tailwind CSS + Lucide Icons (Tek sayfa uygulamas─▒, mobil uyumlu, duyarl─▒ tasar─▒m).
-2. **Backend (API Katman─▒):** Node.js Express API (Port 5000) ÔÇö REST/JSON s├Âzle┼şmeleri, CORS deste─şi, in-memory oturum y├Ânetimi ve statik derleme sunumu.
-3. **ML & Sim├╝lasyon Motoru:** `sarjdenge/web_servis.py` ÔÇö Python 3.12, scikit-learn, scipy.optimize (HiGHS) ve sim├╝lat├Âr ├ğekirde─şi ile 96 ad─▒ml─▒ y├╝k profili ve ara├ğ telemetrisi ├╝retimi.
-4. **Veritaban─▒ Durumu:** Kullan─▒c─▒ veya j├╝ri verisi kal─▒c─▒l─▒─ş─▒ gerekmedi─şinden veritaban─▒ eklenmemi┼ştir; in-memory demo oturumuyla s─▒f─▒r s├╝rt├╝nmeli misafir eri┼şimi sa─şlanm─▒┼şt─▒r.
-5. **Google Kimlik Do─şrulama:** Opsiyoneldir. J├╝ri ├╝yeleri kay─▒t olmak veya ┼şifre girmek zorunda kalmadan do─şrudan "Misafir Modu" ile t├╝m ├Âzellikleri kullanabilir. OAuth s─▒rlar─▒ frontend veya Git deposunda kesinlikle tutulmamaktad─▒r.
+### Mimari Bileşenler:
+1. **Frontend (Kullanıcı Arayüzü):** React 18 + Tailwind CSS + Lucide Icons (Tek sayfa uygulaması, mobil uyumlu, duyarlı tasarım).
+2. **Backend (API Katmanı):** Node.js Express API (Port 5000) — REST/JSON sözleşmeleri, CORS desteği, in-memory oturum yönetimi ve statik derleme sunumu.
+3. **ML & Simülasyon Motoru:** `sarjdenge/web_servis.py` — Python 3.12, scikit-learn, scipy.optimize (HiGHS) ve simülatör çekirdeği ile 96 adımlı yük profili ve araç telemetrisi üretimi.
+4. **Veritabanı Durumu:** Kullanıcı veya jüri verisi kalıcılığı gerekmediğinden veritabanı eklenmemiştir; in-memory demo oturumuyla sıfır sürtünmeli misafir erişimi sağlanmıştır.
+5. **Google Kimlik Doğrulama:** Opsiyoneldir. Jüri üyeleri kayıt olmak veya şifre girmek zorunda kalmadan doğrudan "Misafir Modu" ile tüm özellikleri kullanabilir. OAuth sırları frontend veya Git deposunda kesinlikle tutulmamaktadır.
 
 ---
 
-## 2. Olu┼şturulan ve De─şi┼ştirilen Dosyalar
+## 2. Oluşturulan ve Değiştirilen Dosyalar
 
-| Dosya Yolu | Rol ve A├ğ─▒klama |
+| Dosya Yolu | Rol ve Açıklama |
 | :--- | :--- |
-| `sarjdenge/web_servis.py` | Web aray├╝z├╝ i├ğin tek g├╝nl├╝k 96 ad─▒ml─▒ g├╝├ğ e─şrileri, telemetri ve fiziksel "Neden?" (explainability) motoru. |
-| `tests/test_web_servis.py` | Python web servisinin senaryo, profil ├ğ─▒karma ve neden ├╝retme birim testleri (3/3 ge├ğti). |
-| `web/server/package.json` | Node.js Express sunucu paket yap─▒land─▒rmas─▒. |
-| `web/server/index.js` | Express ana sunucu, rota ba─şlay─▒c─▒, hata yakalay─▒c─▒ ve statik frontend sunucu. |
-| `web/server/routes/scenarios.js` | Senaryo tan─▒mlar─▒ ve `GER├çEK SAHA VER─░S─░` vs `SENTET─░K MODEL (VARSAYIM)` etiketleri. |
-| `web/server/routes/benchmark.js` | Do─şrulanm─▒┼ş C ve D deney tablolar─▒, bootstrap GA de─şerleri ve ├Ârneklem mutabakat─▒ API'si. |
-| `web/server/routes/simulate.js` | Parametrik istekleri Python CLI servisine aktaran ve JSON yan─▒t d├Ânen k├Âpr├╝. |
-| `web/server/routes/auth.js` | Misafir modu (varsay─▒lan) ve opsiyonel Google kimlik do─şrulama sim├╝lasyonu. |
-| `web/server/routes/export.js` | Telemetri ve parametreleri Excel/Pandas uyumlu UTF-8 BOM CSV ve JSON format─▒nda d─▒┼şa aktarma. |
-| `web/server/tests/server.test.js` | Node.js dahili test ko┼şucusuyla API entegrasyon testleri (5/5 ge├ğti). |
-| `web/server/tests/e2e_verify.py` | Canl─▒ HTTP istekleri ve Python motoruyla ├ğal─▒┼şan u├ğtan uca do─şrulama testi (5/5 ge├ğti). |
-| `web/client/package.json` | Vite, React 18, Tailwind CSS ba─ş─▒ml─▒l─▒klar─▒. |
-| `web/client/vite.config.js` | Vite yap─▒land─▒rmas─▒ ve `/api` vekil (proxy) ayarlar─▒. |
+| `sarjdenge/web_servis.py` | Web arayüzü için tek günlük 96 adımlı güç eğrileri, telemetri ve fiziksel "Neden?" (explainability) motoru. |
+| `tests/test_web_servis.py` | Python web servisinin senaryo, profil çıkarma ve neden üretme birim testleri (3/3 geçti). |
+| `web/server/package.json` | Node.js Express sunucu paket yapılandırması. |
+| `web/server/index.js` | Express ana sunucu, rota bağlayıcı, hata yakalayıcı ve statik frontend sunucu. |
+| `web/server/routes/scenarios.js` | Senaryo tanımları ve `GERÇEK SAHA VERİSİ` vs `SENTETİK MODEL (VARSAYIM)` etiketleri. |
+| `web/server/routes/benchmark.js` | Doğrulanmış C ve D deney tabloları, bootstrap GA değerleri ve örneklem mutabakatı API'si. |
+| `web/server/routes/simulate.js` | Parametrik istekleri Python CLI servisine aktaran ve JSON yanıt dönen köprü. |
+| `web/server/routes/auth.js` | Misafir modu (varsayılan) ve opsiyonel Google kimlik doğrulama simülasyonu. |
+| `web/server/routes/export.js` | Telemetri ve parametreleri Excel/Pandas uyumlu UTF-8 BOM CSV ve JSON formatında dışa aktarma. |
+| `web/server/tests/server.test.js` | Node.js dahili test koşucusuyla API entegrasyon testleri (5/5 geçti). |
+| `web/server/tests/e2e_verify.py` | Canlı HTTP istekleri ve Python motoruyla çalışan uçtan uca doğrulama testi (5/5 geçti). |
+| `web/client/package.json` | Vite, React 18, Tailwind CSS bağımlılıkları. |
+| `web/client/vite.config.js` | Vite yapılandırması ve `/api` vekil (proxy) ayarları. |
 | `web/client/tailwind.config.js` | Tailwind tema ve renk paleti (Emerald, Slate, Amber, Rose). |
-| `web/client/src/App.jsx` | Karar destek paneli ana bile┼şeni (Canl─▒ Sim├╝lasyon, Do─şrulama Ar┼şivi, Metodoloji sekmeleri). |
+| `web/client/src/App.jsx` | Karar destek paneli ana bileşeni (Canlı Simülasyon, Doğrulama Arşivi, Metodoloji sekmeleri). |
 | `web/client/src/components/*` | Navbar, TransparencyBanner, ScenarioSelector, CapacityControl, KpiCards, PowerCurveChart, GanttChart, VehicleInspectorModal, BenchmarkView, MethodologyView, ExportModal, AuthModal. |
 
 > [!IMPORTANT]
-> **Dondurulmu┼ş ├çekirdek B├╝t├╝nl├╝─ş├╝ Korundu:**
-> `data.py`, `tahmin.py`, `sim.py`, `deney.py`, `turkiye.py`, `sentetik.py`, `sarjdenge/modeller.py` ve `sarjdenge/deney_v2.py` dosyalar─▒ **kesinlikle de─şi┼ştirilmemi┼ştir**. 2020 ACN holdout test verisi **indirilmemi┼ş ve incelenmemi┼ştir**.
+> **Dondurulmuş Çekirdek Bütünlüğü Korundu:**
+> `data.py`, `tahmin.py`, `sim.py`, `deney.py`, `turkiye.py`, `sentetik.py`, `sarjdenge/modeller.py` ve `sarjdenge/deney_v2.py` dosyaları **kesinlikle değiştirilmemiştir**. 2020 ACN holdout test verisi **indirilmemiş ve incelenmemiştir**.
 
 ---
 
-## 3. Web Aray├╝z├╝ ├ûzellikleri ve J├╝ri Deneyimi
+## 3. Web Arayüzü Özellikleri ve Jüri Deneyimi
 
-Aray├╝z ├╝├ğ ana sekme ve zengin etkile┼şimli mod├╝ller halinde tasarlanm─▒┼şt─▒r:
+Arayüz üç ana sekme ve zengin etkileşimli modüller halinde tasarlanmıştır:
 
-### A. Bilimsel ┼Şeffafl─▒k Bildirimi (Transparency Banner)
-T├╝m sayfalarda en ├╝stte sabit olarak yer alan bu alan, ├Ânceden kay─▒tl─▒ ana hipotezin durumunu j├╝riye d├╝r├╝st├ğe sunar:
-- **Ana Hipotez:** $\Delta = \text{mpc\_tahmin\_guvenli} - \text{mpc\_beyan} \ge +2,00$ y├╝zde puan─▒ (y.p.).
-- **Sonu├ğ:** **├ûnkay─▒tl─▒ hipotez desteklenmedi (S─▒f─▒r hipotezi reddedilemedi)**. ├ûnkay─▒tl─▒ ba┼şar─▒ ├Âl├ğ├╝t├╝ kar┼ş─▒lanmad─▒: fark─▒n en az +2 y├╝zde puan olmas─▒ ve %95 g├╝ven aral─▒─ş─▒n─▒n alt s─▒n─▒r─▒n─▒n s─▒f─▒r─▒n ├╝zerinde bulunmas─▒ gerekiyordu.
-- **Ampirik De─şerler:** $f=0.5$ i├ğin $\Delta = -0.17$ y.p. (%95 GA: $[-0.66, +0.28]$); $f=0.7$ i├ğin $\Delta = -0.58$ y.p. (%95 GA: $[-1.06, -0.10]$); $f=0.9$ i├ğin $\Delta = -0.02$ y.p. (%95 GA: $[-0.22, +0.17]$).
-- **Fiziksel Mekanizma A├ğ─▒klamas─▒:** Hayalet Kapasite Rezervasyonu (*Ghost Capacity Reservation*).
-- **De─şerlendirme Bulgusu:** Bu de─şerlendirmede EDF baz─▒ kapasite d├╝zeylerinde y├╝ksek hedef kar┼ş─▒lama sonu├ğlar─▒ vermi┼ştir. Algoritmalar─▒n performans─▒ kapasite d├╝zeyine ve kullan─▒lan metri─şe g├Âre kar┼ş─▒la┼şt─▒r─▒lmal─▒d─▒r.
+### A. Bilimsel Şeffaflık Bildirimi (Transparency Banner)
+Tüm sayfalarda en üstte sabit olarak yer alan bu alan, önceden kayıtlı ana hipotezin durumunu jüriye dürüstçe sunar:
+- **Ana Hipotez:** $\Delta = \text{mpc\_tahmin\_guvenli} - \text{mpc\_beyan} \ge +2,00$ yüzde puanı (y.p.).
+- **Sonuç:** **Önkayıtlı hipotez desteklenmedi (Sıfır hipotezi reddedilemedi)**. Önkayıtlı başarı ölçütü karşılanmadı: farkın en az +2 yüzde puan olması ve %95 güven aralığının alt sınırının sıfırın üzerinde bulunması gerekiyordu.
+- **Ampirik Değerler:** $f=0.5$ için $\Delta = -0.17$ y.p. (%95 GA: $[-0.66, +0.28]$); $f=0.7$ için $\Delta = -0.58$ y.p. (%95 GA: $[-1.06, -0.10]$); $f=0.9$ için $\Delta = -0.02$ y.p. (%95 GA: $[-0.22, +0.17]$).
+- **Fiziksel Mekanizma Açıklaması:** Hayalet Kapasite Rezervasyonu (*Ghost Capacity Reservation*).
+- **Değerlendirme Bulgusu:** Bu değerlendirmede EDF bazı kapasite düzeylerinde yüksek hedef karşılama sonuçları vermiştir. Algoritmaların performansı kapasite düzeyine ve kullanılan metriğe göre karşılaştırılmalıdır.
 
-### B. Senaryo ve Altyap─▒ Se├ğimi
-1. **T├╝rkiye ─░┼ş Yeri Kamp├╝s├╝:** ACN ampirik verisi ile kalibre edilmi┼ş kurumsal mesai ┼şarj─▒ (`SENTET─░K MODEL (VARSAYIM)`).
-2. **T├╝rkiye Apartman / Site Otopark─▒:** 20 soket, 11 kW Wallbox, 80 kW trafo tahsisli gece ┼şarj─▒ (`SENTET─░K MODEL (VARSAYIM)`).
-3. **T├╝rkiye Karma Yerle┼şke:** G├╝nd├╝z ofis ├ğal─▒┼şanlar─▒, gece site sakinlerinin dinamik payla┼şt─▒─ş─▒ 40 soketli hibrit model (`SENTET─░K MODEL (VARSAYIM)`).
-4. **ACN Ger├ğek Saha (Do─şrulama):** Caltech ve JPL 2019 sahalar─▒n─▒n 68 s─▒k─▒┼ş─▒k g├╝n├╝ndeki 5.207 ger├ğek oturumu (`GER├çEK SAHA VER─░S─░`).
-5. **ACN Ger├ğek Saha (D├Ânemler Aras─▒):** TemmuzÔÇôAral─▒k 2019 d├Ânemi 153 g├╝n├╝ndeki 11.911 ger├ğek oturumu (`GER├çEK SAHA VER─░S─░`).
+### B. Senaryo ve Altyapı Seçimi
+1. **Türkiye İş Yeri Kampüsü:** ACN ampirik verisi ile kalibre edilmiş kurumsal mesai şarjı (`SENTETİK MODEL (VARSAYIM)`).
+2. **Türkiye Apartman / Site Otoparkı:** 20 soket, 11 kW Wallbox, 80 kW trafo tahsisli gece şarjı (`SENTETİK MODEL (VARSAYIM)`).
+3. **Türkiye Karma Yerleşke:** Gündüz ofis çalışanları, gece site sakinlerinin dinamik paylaştığı 40 soketli hibrit model (`SENTETİK MODEL (VARSAYIM)`).
+4. **ACN Gerçek Saha (Doğrulama):** Caltech ve JPL 2019 sahalarının 68 sıkışık günündeki 5.207 gerçek oturumu (`GERÇEK SAHA VERİSİ`).
+5. **ACN Gerçek Saha (Dönemler Arası):** Temmuz–Aralık 2019 dönemi 153 günündeki 11.911 gerçek oturumu (`GERÇEK SAHA VERİSİ`).
 
-### C. Dinamik Kapasite Kontrol├╝ (f)
-- Kayd─▒rma ├ğubu─şu (*slider*) ile kapasite katsay─▒s─▒ $f \in [0.4, 1.0]$ aras─▒nda anl─▒k de─şi┼ştirilebilir.
-- H─▒zl─▒ butonlar: `%40 (A┼ş─▒r─▒ K─▒s─▒tl─▒)`, `%50 (Temel Deney)`, `%70 (Orta Kapasite)`, `%90 (Geni┼ş Kapasite)`.
-- Trafo g├╝├ğ s─▒n─▒r─▒ (kW) ve kontrols├╝z tepe g├╝c├╝ dinamik g├╝ncellenir.
-- "Sim├╝lasyonu ├çal─▒┼şt─▒r" butonu tek t─▒kla Python hatt─▒n─▒ tetikler ve 1 saniye i├ğinde t├╝m grafikleri yeniler.
+### C. Dinamik Kapasite Kontrolü (f)
+- Kaydırma çubuğu (*slider*) ile kapasite katsayısı $f \in [0.4, 1.0]$ arasında anlık değiştirilebilir.
+- Hızlı butonlar: `%40 (Aşırı Kısıtlı)`, `%50 (Temel Deney)`, `%70 (Orta Kapasite)`, `%90 (Geniş Kapasite)`.
+- Trafo güç sınırı (kW) ve kontrolsüz tepe gücü dinamik güncellenir.
+- "Simülasyonu Çalıştır" butonu tek tıkla Python hattını tetikler ve 1 saniye içinde tüm grafikleri yeniler.
 
-### D. 24 Saatlik G├╝├ğ-Zaman Y├╝k E─şrisi (96 Ad─▒m / 15 dk)
-- SVG tabanl─▒ etkile┼şimli y├╝k e─şrisi grafi─şi.
-- Trafo kapasite tavan─▒ (kesikli k─▒rm─▒z─▒ ├ğizgi), kontrols├╝z ┼şarj e─şrisi (noktal─▒ gri ├ğizgi) ve 6 farkl─▒ algoritman─▒n g├╝├ğ profilleri yan yana izlenebilir.
-- ├çizgiler tek tek gizlenip a├ğ─▒labilir (toggle legend).
-- Fare ile ├╝zerine gelindi─şinde (*hover*) ad─▒m─▒n yerel saati ve her algoritman─▒n ├ğekti─şi kW g├╝c├╝ anl─▒k ara├ğ ipucunda (*tooltip*) g├Âsterilir.
+### D. 24 Saatlik Güç-Zaman Yük Eğrisi (96 Adım / 15 dk)
+- SVG tabanlı etkileşimli yük eğrisi grafiği.
+- Trafo kapasite tavanı (kesikli kırmızı çizgi), kontrolsüz şarj eğrisi (noktalı gri çizgi) ve 6 farklı algoritmanın güç profilleri yan yana izlenebilir.
+- Çizgiler tek tek gizlenip açılabilir (toggle legend).
+- Fare ile üzerine gelindiğinde (*hover*) adımın yerel saati ve her algoritmanın çektiği kW gücü anlık araç ipucunda (*tooltip*) gösterilir.
 
-### E. Ara├ğ Bazl─▒ Zaman ├çizelgesi (Gantt) ve "Neden?" (Explainability) Paneli
-- Otoparka ba─şlanan ara├ğlar─▒n var─▒┼ş, ayr─▒l─▒┼ş ve beyan terminleri yatay bloklar halinde ├ğizilir.
-- Herhangi bir araca t─▒kland─▒─ş─▒nda veya listedeki "Neden?" butonuna bas─▒ld─▒─ş─▒nda detayl─▒ modal a├ğ─▒l─▒r:
-  - Arac─▒n ger├ğek talebi, kullan─▒c─▒n─▒n beyan─▒, modelin $q_{20}, q_{50}, q_{80}$ tahminleri.
-  - 6 algoritman─▒n bu araca teslim etti─şi kWh ve doyum oran─▒.
-  - **Fiziksel Karar A├ğ─▒klamas─▒:** ├ûrne─şin:
-    > *"Hayalet Kapasite Rezervasyonu: G├╝venli MPC modeli, di─şer ara├ğlar─▒n y├╝ksek q80 enerji taleplerini dar q20 s├╝relerinde kar┼ş─▒lamak ├╝zere kapasiteyi gelece─şe kilitledi. Bu ara├ğ mevcut olmas─▒na ra─şmen trafo g├╝c├╝ konservatif rezerve edildi─şi i├ğin ara├ğ bekletildi veya d├╝┼ş├╝k kademede ┼şarj edildi."*
-    > *"EDF Dinamik Termin ├ûnceli─şi: EDF algoritmas─▒ gelece─şe hayali rezervasyon ay─▒rmaks─▒z─▒n, ara├ğlar─▒ salt yakla┼şan ayr─▒l─▒┼ş terminine g├Âre dinamik s─▒ralad─▒. Bo┼ş kalan t├╝m g├╝c├╝ an─▒nda bu araca tahsis ederek hedefine ula┼şt─▒rd─▒."*
+### E. Araç Bazlı Zaman Çizelgesi (Gantt) ve "Neden?" (Explainability) Paneli
+- Otoparka bağlanan araçların varış, ayrılış ve beyan terminleri yatay bloklar halinde çizilir.
+- Herhangi bir araca tıklandığında veya listedeki "Neden?" butonuna basıldığında detaylı modal açılır:
+  - Aracın gerçek talebi, kullanıcının beyanı, modelin $q_{20}, q_{50}, q_{80}$ tahminleri.
+  - 6 algoritmanın bu araca teslim ettiği kWh ve doyum oranı.
+  - **Fiziksel Karar Açıklaması:** Örneğin:
+    > *"Hayalet Kapasite Rezervasyonu: Güvenli MPC modeli, diğer araçların yüksek q80 enerji taleplerini dar q20 sürelerinde karşılamak üzere kapasiteyi geleceğe kilitledi. Bu araç mevcut olmasına rağmen trafo gücü konservatif rezerve edildiği için araç bekletildi veya düşük kademede şarj edildi."*
+    > *"EDF Dinamik Termin Önceliği: EDF algoritması geleceğe hayali rezervasyon ayırmaksızın, araçları salt yaklaşan ayrılış terminine göre dinamik sıraladı. Boş kalan tüm gücü anında bu araca tahsis ederek hedefine ulaştırdı."*
 
-### F. Do─şrulama ve Hipotez Ar┼şivi (Benchmark Sekmesi)
-- ─░┼ş Paketi C ve D'nin do─şrulanm─▒┼ş t├╝m tablolar─▒n─▒ i├ğerir.
-- E┼şle┼ştirilmi┼ş Bootstrap (B=2000) tablosu: 95% g├╝ven aral─▒klar─▒ ve hipotez kararlar─▒.
-- 68 g├╝nl├╝k do─şrulama ve 153 g├╝nl├╝k d├Ânemler aras─▒ performans ├Âzetleri.
-- **├ûrneklem Mutabakat─▒:** 5.315 do─şrulama oturumu ile 5.207 sim├╝lasyon oturumu aras─▒ndaki 108 oturumluk fark─▒n, `min_arac_gunluk=8` kural─▒ gere─şi trafo s─▒k─▒┼ş─▒kl─▒─ş─▒ ya┼şanmayan seyrek g├╝nlerin elenmesinden kaynakland─▒─ş─▒ a├ğ─▒k├ğa belgelenmi┼ştir.
+### F. Doğrulama ve Hipotez Arşivi (Benchmark Sekmesi)
+- İş Paketi C ve D'nin doğrulanmış tüm tablolarını içerir.
+- Eşleştirilmiş Bootstrap (B=2000) tablosu: 95% güven aralıkları ve hipotez kararları.
+- 68 günlük doğrulama ve 153 günlük dönemler arası performans özetleri.
+- **Örneklem Mutabakatı:** 5.315 doğrulama oturumu ile 5.207 simülasyon oturumu arasındaki 108 oturumluk farkın, `min_arac_gunluk=8` kuralı gereği trafo sıkışıklığı yaşanmayan seyrek günlerin elenmesinden kaynaklandığı açıkça belgelenmiştir.
 
-### G. D─▒┼şa Aktarma (Export)
-- Sim├╝le edilen g├╝n├╝n t├╝m telemetrisi, ara├ğ bazl─▒ kararlar─▒ ve "Neden?" a├ğ─▒klamalar─▒ Excel ve Pandas uyumlu UTF-8 BOM CSV veya JSON format─▒nda tek t─▒kla indirilebilir.
+### G. Dışa Aktarma (Export)
+- Simüle edilen günün tüm telemetrisi, araç bazlı kararları ve "Neden?" açıklamaları Excel ve Pandas uyumlu UTF-8 BOM CSV veya JSON formatında tek tıkla indirilebilir.
 
 ---
 
-## 4. Yerel ├çal─▒┼şt─▒rma Talimatlar─▒
+## 4. Yerel Çalıştırma Talimatları
 
-Sistem hem ba─ş─▒ms─▒z ├╝retim modunda (Express ├╝zerinden tek port) hem de geli┼ştirici modunda (Vite HMR) ├ğal─▒┼şt─▒r─▒labilir:
+Sistem hem bağımsız üretim modunda (Express üzerinden tek port) hem de geliştirici modunda (Vite HMR) çalıştırılabilir:
 
-### Se├ğenek 1: H─▒zl─▒ ├£retim Modu (Tavsiye Edilen ÔÇö Tek Port)
-Frontend derlenmi┼ş haldedir (`web/client/dist`). Backend sunucusu tek komutla hem API'yi hem aray├╝z├╝ sunar:
+### Seçenek 1: Hızlı Üretim Modu (Tavsiye Edilen — Tek Port)
+Frontend derlenmiş haldedir (`web/client/dist`). Backend sunucusu tek komutla hem API'yi hem arayüzü sunar:
 
 ```powershell
 cd "c:\Users\HP-PC\OneDrive\Pictures\Desktop\climathon v2\web\server"
 npm start
 ```
-Taray─▒c─▒n─▒zdan a├ğ─▒n: **`http://localhost:5000`**
+Tarayıcınızdan açın: **`http://localhost:5000`**
 
-### Se├ğenek 2: Geli┼ştirici Modu (Vite Hot-Reload)
-Frontend ├╝zerinde canl─▒ geli┼ştirme yapmak i├ğin iki terminal a├ğ─▒l─▒r:
+### Seçenek 2: Geliştirici Modu (Vite Hot-Reload)
+Frontend üzerinde canlı geliştirme yapmak için iki terminal açılır:
 
 **Terminal 1 (Node.js API):**
 ```powershell
@@ -124,13 +124,13 @@ npm start
 cd "c:\Users\HP-PC\OneDrive\Pictures\Desktop\climathon v2\web\client"
 npm run dev
 ```
-Geli┼ştirici aray├╝z├╝: **`http://localhost:5173`** (API ├ğa─şr─▒lar─▒ otomatik olarak `localhost:5000`'e y├Ânlendirilir).
+Geliştirici arayüzü: **`http://localhost:5173`** (API çağrıları otomatik olarak `localhost:5000`'e yönlendirilir).
 
 ---
 
-## 5. Do─şrulama ve Test Sonu├ğlar─▒
+## 5. Doğrulama ve Test Sonuçları
 
-T├╝m sistem ├╝├ğ katmanl─▒ test piramidiyle %100 do─şrulanm─▒┼şt─▒r:
+Tüm sistem üç katmanlı test piramidiyle %100 doğrulanmıştır:
 
 ### A. Python Birim ve Entegrasyon Testleri (`pytest`)
 ```
@@ -144,24 +144,24 @@ tests/test_veri_hijyeni.py ........                                      [ 83%]
 tests/test_web_servis.py ...                                             [100%]
 ============================== 48 passed in 110s ===============================
 ```
-- **Sonu├ğ:** 48/48 test ba┼şar─▒yla ge├ğti. ├çekirdek sim├╝lat├Âr, veri hijyeni, sentetik v2, quantile modeller ve yeni web servisi s─▒f─▒r regresyonla ├ğal─▒┼şmaktad─▒r.
+- **Sonuç:** 48/48 test başarıyla geçti. Çekirdek simülatör, veri hijyeni, sentetik v2, quantile modeller ve yeni web servisi sıfır regresyonla çalışmaktadır.
 
 ### B. Node.js API Entegrasyon Testleri (`node --test`)
 ```
-Ô£ö GET /api/health returns ok status (92ms)
-Ô£ö GET /api/scenarios returns scenarios list with labels (25ms)
-Ô£ö GET /api/benchmark-results returns verified experiment results (25ms)
-Ô£ö Auth flow: Guest mode default and Google login simulation (81ms)
-Ô£ö POST /api/export/csv exports formatted csv with UTF-8 BOM (24ms)
-Ôä╣ tests 5 | pass 5 | fail 0 | cancelled 0
+✔ GET /api/health returns ok status (92ms)
+✔ GET /api/scenarios returns scenarios list with labels (25ms)
+✔ GET /api/benchmark-results returns verified experiment results (25ms)
+✔ Auth flow: Guest mode default and Google login simulation (81ms)
+✔ POST /api/export/csv exports formatted csv with UTF-8 BOM (24ms)
+ℹ tests 5 | pass 5 | fail 0 | cancelled 0
 ```
-- **Sonu├ğ:** 5/5 test ba┼şar─▒yla ge├ğti.
+- **Sonuç:** 5/5 test başarıyla geçti.
 
-### C. U├ğtan Uca (E2E) Canl─▒ Sistem Do─şrulama Testi
-`py web/server/tests/e2e_verify.py` komutu canl─▒ Node.js sunucusunu aya─şa kald─▒r─▒p ger├ğek sim├╝lasyonu tetiklemi┼ştir:
+### C. Uçtan Uca (E2E) Canlı Sistem Doğrulama Testi
+`py web/server/tests/e2e_verify.py` komutu canlı Node.js sunucusunu ayağa kaldırıp gerçek simülasyonu tetiklemiştir:
 ```
 [E2E] Starting Node.js server...
-[E2E] 1. Testing GET /api/health... -> OK: ┼ŞarjDenge AI Decision Support Server
+[E2E] 1. Testing GET /api/health... -> OK: ŞarjDenge AI Decision Support Server
 [E2E] 2. Testing GET /api/scenarios... -> OK: 5 scenarios loaded.
 [E2E] 3. Testing GET /api/benchmark-results... -> OK: Benchmark results verified. Hypothesis verdict: False
 [E2E] 4. Testing POST /api/simulate (live python execution)... -> OK: Simulated 23 vehicles in isyeri_gunduz at f=0.5
@@ -171,8 +171,8 @@ tests/test_web_servis.py ...                                             [100%]
 
 ---
 
-## 6. S─▒n─▒rlar ve Bilimsel Uyar─▒lar
+## 6. Sınırlar ve Bilimsel Uyarılar
 
-1. **2020 Holdout Verisi:** 2020 ACN holdout test verisi j├╝ri aray├╝z├╝ne kesinlikle dahil edilmemi┼ştir ve indirilmemi┼ştir; nihai holdout de─şerlendirmesi ayr─▒ bir a┼şama olarak korunmaktad─▒r.
-2. **T├╝rkiye Konut Verisi:** T├╝rkiye apartman ve site otoparklar─▒ senaryosu, hen├╝z T├╝rkiye'de a├ğ─▒k konut otopark─▒ telemetrisi bulunmad─▒─ş─▒ i├ğin parametrik bir modeldir. Bu durum aray├╝z├╝n her ekran─▒nda `SENTET─░K MODEL (VARSAYIM)` rozetiyle a├ğ─▒k├ğa ilan edilmektedir.
-3. **Ghost Reservation vs Erken Ayr─▒lma:** G├╝venli MPC, erken ayr─▒lan s├╝r├╝c├╝lerde beyana k─▒yasla marjinal bir avantaj sa─şlasa da (%78.56 vs %78.04), genel filoda trafo kapasitesini kilitledi─şi i├ğin EDF'nin gerisinde kalm─▒┼şt─▒r.
+1. **2020 Holdout Verisi:** 2020 ACN holdout test verisi jüri arayüzüne kesinlikle dahil edilmemiştir ve indirilmemiştir; nihai holdout değerlendirmesi ayrı bir aşama olarak korunmaktadır.
+2. **Türkiye Konut Verisi:** Türkiye apartman ve site otoparkları senaryosu, henüz Türkiye'de açık konut otoparkı telemetrisi bulunmadığı için parametrik bir modeldir. Bu durum arayüzün her ekranında `SENTETİK MODEL (VARSAYIM)` rozetiyle açıkça ilan edilmektedir.
+3. **Ghost Reservation vs Erken Ayrılma:** Güvenli MPC, erken ayrılan sürücülerde beyana kıyasla marjinal bir avantaj sağlasa da (%78.56 vs %78.04), genel filoda trafo kapasitesini kilitlediği için EDF'nin gerisinde kalmıştır.

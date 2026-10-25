@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Sliders, Play, Calendar, RefreshCw } from 'lucide-react';
 import { formatKw, formatPercent } from '../utils/formatters.js';
 
@@ -30,11 +30,11 @@ export default function CapacityControl({
             <div className="flex items-center space-x-2">
               <Sliders className="w-3.5 h-3.5 text-emerald-700" />
               <span className="text-xs font-semibold text-slate-900">
-                Kapasite Tavan─▒
+                Kapasite Tavanı
               </span>
             </div>
             <span className="text-xs px-2 py-0.5 rounded-md bg-slate-100 text-slate-800 font-semibold tabular-nums">
-              f = {Number(f).toFixed(2).replace('.', ',')} ({formatPercent(f * 100, 0)} ÔÇó {formatKw(currentCapKw)})
+              f = {Number(f).toFixed(2).replace('.', ',')} ({formatPercent(f * 100, 0)} • {formatKw(currentCapKw)})
             </span>
           </div>
 
@@ -78,7 +78,7 @@ export default function CapacityControl({
             <select
               value={day}
               onChange={(e) => onChangeDay(e.target.value)}
-              aria-label="Sim├╝lasyon G├╝n├╝"
+              aria-label="Simülasyon Günü"
               className="bg-slate-50 border border-slate-200 text-slate-900 rounded-lg px-2.5 py-1.5 text-xs tabular-nums focus:outline-none focus:border-emerald-600 focus:bg-white"
             >
               {scenario?.availableDays?.map((d) => (
@@ -101,12 +101,12 @@ export default function CapacityControl({
             {loading ? (
               <>
                 <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-400" />
-                <span>├çal─▒┼şt─▒r─▒l─▒yorÔÇĞ</span>
+                <span>Simüle Ediliyor…</span>
               </>
             ) : (
               <>
                 <Play className="w-3.5 h-3.5 fill-white stroke-white" />
-                <span>Sim├╝lasyonu ├çal─▒┼şt─▒r</span>
+                <span>Simülasyonu Çalıştır</span>
               </>
             )}
           </button>

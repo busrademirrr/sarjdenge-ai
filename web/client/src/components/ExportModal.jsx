@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { X, Download, FileSpreadsheet, FileCode, CheckCircle, AlertCircle } from 'lucide-react';
 
 export default function ExportModal({ simulation, onClose }) {
@@ -20,7 +20,7 @@ export default function ExportModal({ simulation, onClose }) {
         body: JSON.stringify({ simulation }),
       });
 
-      if (!res.ok) throw new Error('D─▒┼şa aktarma ba┼şar─▒s─▒z oldu.');
+      if (!res.ok) throw new Error('Dışa aktarma başarısız oldu.');
 
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
@@ -32,9 +32,9 @@ export default function ExportModal({ simulation, onClose }) {
       a.remove();
       window.URL.revokeObjectURL(url);
 
-      setSuccessMsg(`${format.toUpperCase()} dosyas─▒ ba┼şar─▒yla indirildi.`);
+      setSuccessMsg(`${format.toUpperCase()} dosyası başarıyla indirildi.`);
     } catch (err) {
-      setErrorMsg(err.message || 'Dosya indirilirken bir hata olu┼ştu.');
+      setErrorMsg(err.message || 'Dosya indirilirken bir hata oluştu.');
     } finally {
       setDownloading(false);
     }
@@ -46,7 +46,7 @@ export default function ExportModal({ simulation, onClose }) {
         <div className="flex items-center justify-between pb-4 border-b border-slate-200">
           <div className="flex items-center space-x-2">
             <Download className="w-5 h-5 text-emerald-700" />
-            <h3 className="text-base font-bold text-slate-900">Sim├╝lasyon Sonu├ğlar─▒n─▒ ─░ndir</h3>
+            <h3 className="text-base font-bold text-slate-900">Simülasyon Sonuçlarını İndir</h3>
           </div>
           <button
             onClick={onClose}
@@ -58,7 +58,7 @@ export default function ExportModal({ simulation, onClose }) {
 
         <div className="py-4 space-y-3">
           <p className="text-xs text-slate-600">
-            Aktif sim├╝lasyonun 96 ad─▒ml─▒ g├╝├ğ e─şrilerini, ara├ğ bazl─▒ telemetrisini ve karar a├ğ─▒klamalar─▒n─▒ d─▒┼şa aktarabilirsiniz.
+            Aktif simülasyonun 96 adımlı güç eğrilerini, araç bazlı telemetrisini ve karar açıklamalarını dışa aktarabilirsiniz.
           </p>
 
           <div className="grid grid-cols-2 gap-3 pt-2">
@@ -68,7 +68,7 @@ export default function ExportModal({ simulation, onClose }) {
               className="flex flex-col items-center justify-center p-4 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-emerald-600 transition group"
             >
               <FileSpreadsheet className="w-8 h-8 text-emerald-700 mb-2 group-hover:scale-105 transition-transform" />
-              <span className="font-bold text-xs text-slate-900">CSV ─░ndir</span>
+              <span className="font-bold text-xs text-slate-900">CSV İndir</span>
               <span className="text-xs text-slate-500 mt-0.5">Excel / Pandas Uyumlu</span>
             </button>
 
@@ -78,8 +78,8 @@ export default function ExportModal({ simulation, onClose }) {
               className="flex flex-col items-center justify-center p-4 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-blue-600 transition group"
             >
               <FileCode className="w-8 h-8 text-blue-700 mb-2 group-hover:scale-105 transition-transform" />
-              <span className="font-bold text-xs text-slate-900">JSON ─░ndir</span>
-              <span className="text-xs text-slate-500 mt-0.5">Ham API ├ç─▒kt─▒s─▒</span>
+              <span className="font-bold text-xs text-slate-900">JSON İndir</span>
+              <span className="text-xs text-slate-500 mt-0.5">Ham API Çıktısı</span>
             </button>
           </div>
 

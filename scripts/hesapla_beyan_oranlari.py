@@ -1,9 +1,9 @@
-﻿"""┼ŞarjDenge AI ÔÇö Beyan Oran─▒ Kuantillerini Hesaplama ve Do─şrulama Beti─şi.
+"""ŞarjDenge AI — Beyan Oranı Kuantillerini Hesaplama ve Doğrulama Betiği.
 
-Bu betik, 2019 H1 e─şitim k├╝mesini (%60 g├╝n, 7.808 oturum) kullanarak
-kullan─▒c─▒ beyan─▒ ile ger├ğekle┼şen de─şerler aras─▒ndaki oran kuantillerini (q20, q50, q80) hesaplar,
-├ğ─▒kt─▒y─▒ config/beyan_oranlari.json dosyas─▒na yazar ve do─şrulama k├╝mesindeki (%40 g├╝n, 5.315 oturum)
-kapsam kalibrasyonunu do─şrular.
+Bu betik, 2019 H1 eğitim kümesini (%60 gün, 7.808 oturum) kullanarak
+kullanıcı beyanı ile gerçekleşen değerler arasındaki oran kuantillerini (q20, q50, q80) hesaplar,
+çıktıyı config/beyan_oranlari.json dosyasına yazar ve doğrulama kümesindeki (%40 gün, 5.315 oturum)
+kapsam kalibrasyonunu doğrular.
 """
 
 from __future__ import annotations
@@ -26,7 +26,7 @@ CIKTI_JSON = PROJE_KOK / "config" / "beyan_oranlari.json"
 
 def hesapla():
     if not CSV_YOLU.exists():
-        print(f"HATA: '{CSV_YOLU}' bulunamad─▒!", file=sys.stderr)
+        print(f"HATA: '{CSV_YOLU}' bulunamadı!", file=sys.stderr)
         sys.exit(1)
 
     df = veri_hijyeni.temizle(CSV_YOLU, sadece_beyanli=True)
@@ -34,21 +34,21 @@ def hesapla():
 
     n_egit = len(egit_df)
     n_val = len(val_df)
-    assert n_egit == 7808, f"Beklenen 7808 e─şitim sat─▒r─▒, bulunan: {n_egit}"
-    assert n_val == 5315, f"Beklenen 5315 do─şrulama sat─▒r─▒, bulunan: {n_val}"
+    assert n_egit == 7808, f"Beklenen 7808 eğitim satırı, bulunan: {n_egit}"
+    assert n_val == 5315, f"Beklenen 5315 doğrulama satırı, bulunan: {n_val}"
 
-    # S├╝re Oran─▒: Ger├ğek S├╝re / Beyan Edilen S├╝re
+    # Süre Oranı: Gerçek Süre / Beyan Edilen Süre
     gecerli_sure = (egit_df["beyan_sure_dk"] > 0) & (egit_df["sure_dk"] > 0)
     oran_sure_egit = egit_df.loc[gecerli_sure, "sure_dk"] / egit_df.loc[gecerli_sure, "beyan_sure_dk"]
 
-    # Enerji Oran─▒: Ger├ğek Teslim Enerji / Beyan Edilen Enerji
+    # Enerji Oranı: Gerçek Teslim Enerji / Beyan Edilen Enerji
     gecerli_kwh = (egit_df["kWhRequested"] > 0) & (egit_df["kWhDelivered"] > 0)
     oran_kwh_egit = egit_df.loc[gecerli_kwh, "kWhDelivered"] / egit_df.loc[gecerli_kwh, "kWhRequested"]
 
     q_sure = np.percentile(oran_sure_egit, [20, 50, 80])
     q_kwh = np.percentile(oran_kwh_egit, [20, 50, 80])
 
-    # Do─şrulama k├╝mesinde kapsam ├Âl├ğ├╝m├╝
+    # Doğrulama kümesinde kapsam ölçümü
     v_sure = (val_df["beyan_sure_dk"] > 0) & (val_df["sure_dk"] > 0)
     oran_sure_val = val_df.loc[v_sure, "sure_dk"] / val_df.loc[v_sure, "beyan_sure_dk"]
     v_kwh = (val_df["kWhRequested"] > 0) & (val_df["kWhDelivered"] > 0)
@@ -64,8 +64,8 @@ def hesapla():
 
     sonuc = {
         "versiyon": "1.0.0",
-        "tanim": "┼ŞarjDenge AI ÔÇö Veriden ├û─şrenilen Beyan Oran─▒ Kuantil Baseline'─▒",
-        "aciklama": "Kullan─▒c─▒n─▒n ilk beyan─▒ (minutesAvailable_ilk ve kWhRequested_ilk) ile ger├ğekle┼şen de─şerler (sure_dk ve kWhDelivered) aras─▒ndaki ampirik oran kuantilleri.",
+        "tanim": "ŞarjDenge AI — Veriden Öğrenilen Beyan Oranı Kuantil Baseline'ı",
+        "aciklama": "Kullanıcının ilk beyanı (minutesAvailable_ilk ve kWhRequested_ilk) ile gerçekleşen değerler (sure_dk ve kWhDelivered) arasındaki ampirik oran kuantilleri.",
         "egitim_kaynagi": "acn_oturumlar_v2.csv",
         "egitim_donemi_baslangic": "2019-01-01 00:00:00 America/Los_Angeles",
         "egitim_donemi_bitis": "2019-04-18 23:59:59 America/Los_Angeles",
@@ -114,9 +114,9 @@ def hesapla():
     with open(CIKTI_JSON, "w", encoding="utf-8") as f:
         json.dump(sonuc, f, indent=2, ensure_ascii=False)
 
-    print(f"Ba┼şar─▒yla hesapland─▒ ve kaydedildi: {CIKTI_JSON}")
-    print(f"S├╝re Oranlar─▒: q20={sonuc['sure_oranlari']['q20']}, q50={sonuc['sure_oranlari']['q50']}, q80={sonuc['sure_oranlari']['q80']}")
-    print(f"Enerji Oranlar─▒: q20={sonuc['enerji_oranlari']['q20']}, q50={sonuc['enerji_oranlari']['q50']}, q80={sonuc['enerji_oranlari']['q80']}")
+    print(f"Başarıyla hesaplandı ve kaydedildi: {CIKTI_JSON}")
+    print(f"Süre Oranları: q20={sonuc['sure_oranlari']['q20']}, q50={sonuc['sure_oranlari']['q50']}, q80={sonuc['sure_oranlari']['q80']}")
+    print(f"Enerji Oranları: q20={sonuc['enerji_oranlari']['q20']}, q50={sonuc['enerji_oranlari']['q50']}, q80={sonuc['enerji_oranlari']['q80']}")
 
 
 if __name__ == "__main__":
