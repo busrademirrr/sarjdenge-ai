@@ -27,7 +27,7 @@
 
 | Fotoğraf / Avatar | İsim Soyisim | Rol ve Sorumluluklar | İletişim |
 | :---: | :--- | :--- | :--- |
-| 👩‍💻 | **Büşra Demir** | **Product Owner & Scrum Master & Full-Stack AI Developer**<br>*(Tek kişilik bağımsız ekip)*<br>• Veri Mühendisliği ve Kaçak Önleme Protokolü<br>• Quantile Regresyon & SciPy HiGHS LP-MPC Çözücüsü<br>• Node.js Express API & React Vite Karar Destek Arayüzü<br>• Bilimsel Denetim, E2E Test Otomasyonu ve Dağıtım | [![GitHub](https://img.shields.io/badge/GitHub-busrademirrr-181717?logo=github)](https://github.com/busrademirrr) [LinkedIn](https://www.linkedin.com/in/busrademir473a833032/) |
+| 👩‍💻 | **Büşra Demir** | **Product Owner & Scrum Master & Full-Stack AI Developer**<br>*(Tek kişilik bağımsız ekip)*<br>• Veri Mühendisliği ve Kaçak Önleme Protokolü<br>• Quantile Regresyon & SciPy HiGHS LP-MPC Çözücüsü<br>• Node.js Express API & React Vite Karar Destek Arayüzü<br>• Bilimsel Denetim, E2E Test Otomasyonu ve Dağıtım | [![GitHub](https://img.shields.io/badge/GitHub-busrademirrr-181717?logo=github)](https://github.com/busrademirrr) [![LinkedIn](https://img.shields.io/badge/LinkedIn-Büşra_Demir-0A66C2?logo=linkedin)](https://www.linkedin.com/in/busrademir473a833032/) |
 
 > **Tek Kişilik Ekipte Scrum Uyarlaması:** Proje süreci boyunca Agile prensipleri korunmuş; PO (kapsam ve senaryo yönetimi), Scrum Master (sprint planlama, engel kaldırma ve retrospektif) ve Developer (mimari geliştirme ve test) rolleri şeffaf sprint günlükleriyle belgelenmiştir.
 
