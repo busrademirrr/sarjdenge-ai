@@ -6,8 +6,16 @@
  * 2. Aynı anda gelen özdeş istekler tek bir Python hesabını paylaşır (Single-Flight).
  */
 
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const precomputedPath = path.join(__dirname, 'precomputed_data.json');
+
 class LRUCache {
-  constructor(maxEntries = 30) {
+  constructor(maxEntries = 100) {
     this.maxEntries = maxEntries;
     this.cache = new Map();
   }
@@ -70,6 +78,42 @@ export function normalizeKey(route, body = {}) {
   }
 
   return `${route}:${JSON.stringify(body)}`;
+}
+
+// Sunucu başlangıcında önceden hesaplanmış tüm varsayılan senaryoları önbelleğe yükle
+try {
+  if (fs.existsSync(precomputedPath)) {
+    const raw = fs.readFileSync(precomputedPath, 'utf-8');
+    const preData = JSON.parse(raw);
+    if (preData.advisor) {
+      for (const [k, val] of Object.entries(preData.advisor)) {
+        const parts = k.split('_');
+        const multiDay = parts[parts.length - 1] === 'true';
+        const day = parts[parts.length - 2];
+        const scId = parts.slice(0, parts.length - 2).join('_');
+
+        const keyWithDay = normalizeKey('capacityAdvisor', { scenarioId: scId, day, seed: 42, multiDay });
+        const keyNoDay = normalizeKey('capacityAdvisor', { scenarioId: scId, day: '', seed: 42, multiDay });
+        lruCache.set(keyWithDay, val);
+        lruCache.set(keyNoDay, val);
+      }
+    }
+    if (preData.simulation) {
+      for (const [k, val] of Object.entries(preData.simulation)) {
+        const parts = k.split('_');
+        const day = parts[parts.length - 1];
+        const scId = parts.slice(0, parts.length - 2).join('_');
+
+        const keyWithDay = normalizeKey('simulate', { scenarioId: scId, f: 0.5, day, seed: 42 });
+        const keyNoDay = normalizeKey('simulate', { scenarioId: scId, f: 0.5, day: '', seed: 42 });
+        lruCache.set(keyWithDay, val);
+        lruCache.set(keyNoDay, val);
+      }
+    }
+    console.log(`[Cache] ${lruCache.size} adet önceden hesaplanmış senaryo hazır önbelleğe yüklendi.`);
+  }
+} catch (e) {
+  console.warn('[Cache] Önceden hesaplanmış veri yüklenirken uyarı:', e.message);
 }
 
 /**

@@ -86,15 +86,32 @@ export default function CapacityAdvisor({
   };
 
   useEffect(() => {
-    if (selectedScenarioId) {
-      runAdvisor(selectedScenarioId, day, isMultiDay);
+    if (!selectedScenarioId) return;
+    const sc = scenarios?.find((s) => s.id === selectedScenarioId);
+    if (!sc) return;
+
+    const isDayValid = !day || sc.availableDays?.includes(day) || day === sc.defaultDay;
+    if (!isDayValid) return;
+
+    const targetDay = day || sc.defaultDay;
+
+    if (
+      advisorData &&
+      advisorData.senaryo_id === selectedScenarioId &&
+      (advisorData.tarih === targetDay || (!targetDay && advisorData.ornek_gun)) &&
+      !error
+    ) {
+      return;
     }
+
+    runAdvisor(selectedScenarioId, targetDay, isMultiDay);
+
     return () => {
       if (activeControllerRef.current) {
         activeControllerRef.current.abort();
       }
     };
-  }, [selectedScenarioId, day, isMultiDay]);
+  }, [selectedScenarioId, day, isMultiDay, scenarios]);
 
   // Seçilen yöntemin adını temiz göster; eşitlik durumunda orijinal metni koru
   const formatMethodDisplay = (rawName) => {

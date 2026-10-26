@@ -196,7 +196,7 @@ export default function App() {
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Tab 1: Live Simulation */}
-        {activeTab === 'simulation' && (
+        <div className={activeTab === 'simulation' ? 'block' : 'hidden'}>
           <div>
             {/* 1. Scenario Selector */}
             <ScenarioSelector
@@ -433,10 +433,10 @@ export default function App() {
               </section>
             )}
           </div>
-        )}
+        </div>
 
         {/* Tab 2: Capacity Advisor */}
-        {activeTab === 'advisor' && (
+        <div className={activeTab === 'advisor' ? 'block' : 'hidden'}>
           <CapacityAdvisor
             scenarios={scenarios}
             selectedScenarioId={selectedScenarioId}
@@ -444,7 +444,7 @@ export default function App() {
             day={day}
             onChangeDay={handleChangeDay}
           />
-        )}
+        </div>
 
         {/* Tab 3: Verification & Benchmarks */}
         {activeTab === 'benchmark' && (

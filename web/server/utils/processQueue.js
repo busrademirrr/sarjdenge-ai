@@ -84,4 +84,4 @@ class ProcessQueue {
   }
 }
 
-export const pythonProcessQueue = new ProcessQueue(1, 4, 60000);
+export const pythonProcessQueue = new ProcessQueue(2, 10, 95000);
