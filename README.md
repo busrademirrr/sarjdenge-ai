@@ -27,7 +27,7 @@
 
 | Fotoğraf / Avatar | İsim Soyisim | Rol ve Sorumluluklar | İletişim |
 | :---: | :--- | :--- | :--- |
-| 👩‍💻 | **Büşra Demir** | **Product Owner & Scrum Master & Full-Stack AI Developer**<br>*(Tek kişilik bağımsız ekip)*<br>• Veri Mühendisliği ve Kaçak Önleme Protokolü<br>• Quantile Regresyon & SciPy HiGHS LP-MPC Çözücüsü<br>• Node.js Express API & React Vite Karar Destek Arayüzü<br>• Bilimsel Denetim, E2E Test Otomasyonu ve Dağıtım | [![GitHub](https://img.shields.io/badge/GitHub-busrademirrr-181717?logo=github)](https://github.com/busrademirrr) [![LinkedIn](https://img.shields.io/badge/LinkedIn-busrademir-0A66C2?logo=linkedin)](https://linkedin.com) |
+| 👩‍💻 | **Büşra Demir** | **Product Owner & Scrum Master & Full-Stack AI Developer**<br>*(Tek kişilik bağımsız ekip)*<br>• Veri Mühendisliği ve Kaçak Önleme Protokolü<br>• Quantile Regresyon & SciPy HiGHS LP-MPC Çözücüsü<br>• Node.js Express API & React Vite Karar Destek Arayüzü<br>• Bilimsel Denetim, E2E Test Otomasyonu ve Dağıtım | [![GitHub](https://img.shields.io/badge/GitHub-busrademirrr-181717?logo=github)](https://github.com/busrademirrr) [![LinkedIn](https://img.shields.io/badge/LinkedIn-busrademir-0A66C2?logo=linkedin)]([https://linkedin.com](https://www.linkedin.com/in/busrademir473a833032/)) |
 
 > **Tek Kişilik Ekipte Scrum Uyarlaması:** Proje süreci boyunca Agile prensipleri korunmuş; PO (kapsam ve senaryo yönetimi), Scrum Master (sprint planlama, engel kaldırma ve retrospektif) ve Developer (mimari geliştirme ve test) rolleri şeffaf sprint günlükleriyle belgelenmiştir.
 
@@ -48,7 +48,6 @@ Sistem; ham telemetri verisindeki kullanıcı belirsizliklerini **Gradient Boost
 - 🌐 **Canlı Web Uygulaması:** [https://sarjdenge-ai.onrender.com](https://sarjdenge-ai.onrender.com/)
 - 📊 **Proje Sunumu (Canva):** [ŞarjDenge AI — Final Sunumu](https://canva.link/9675ddf04gepgdp)
 - ⚙️ **Canlı Backend API Sağlık Kontrolü:** [https://sarjdenge-ai.onrender.com/api/health](https://sarjdenge-ai.onrender.com/api/health)
-- 📹 **2 Dakikalık Jüri Tanıtım Videosu (YouTube):** [ŞarjDenge AI — Ürün Tanıtımı ve Canlı Demo](https://youtu.be/placeholder)
 - 📋 **Proje Tasarım İncelemesi (PDR Dokümanı):** [`docs/PROJE_GENEL_FAALIYET_VE_SONUC_RAPORU.md`](docs/PROJE_GENEL_FAALIYET_VE_SONUC_RAPORU.md)
 
 ---
