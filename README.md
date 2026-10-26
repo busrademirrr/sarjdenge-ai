@@ -35,7 +35,7 @@
 
 ## 🎯 Ürün Açıklaması
 
-Elektrikli araç (EV) dönüşümünde apartman siteleri, iş yeri kampüsleri ve otopark işletmecileri büyük bir altyapı darboğazıyla karşılaşmaktadır: **Aynı anda şarja takılan onlarca araç, tesisin mevcut trafo ve bağlantı kapasitesini aşarak yüksek tepe aşım cezalarına (peak penalty) ve şebeke kesintilerine yol açar.** Yeni trafo yatırımı (CapEx) ise aylar süren bürokratik onaylar ve milyonlarca liralık maliyet demektir.
+Elektrikli araç (EV) dönüşümünde apartman siteleri, iş yeri kampüsleri ve otopark işletmecileri büyük bir altyapı darboğazıyla karşılaşmaktadır: **Aynı anda şarja takılan araçlar, tesisin mevcut trafo ve bağlantı kapasitesini aşarak yüksek tepe aşım maliyetlerine ve altyapı darboğazına yol açabilir.** Yeni trafo yatırımı (CapEx) ise uzun onay süreçleri ve yüksek altyapı güçlendirme maliyeti gerektirir.
 
 **ŞarjDenge AI**, tesisin trafo kapasitesini bir sınır olarak kabul eder ve **"Bu kapasiteyi 1 Watt bile aşmadan, araçların şarj hedefini maksimum seviyede nasıl karşılarız?"** ve **"Belirli bir araç filosu için gereken asgari trafo kapasitesi kaç kW'tır?"** sorularını çözer.
 
@@ -45,8 +45,9 @@ Sistem; ham telemetri verisindeki kullanıcı belirsizliklerini **Gradient Boost
 
 ## 🔗 Canlı Bağlantılar (Live Demo)
 
-- 🌐 **Canlı Web Uygulaması:** `https://sarjdenge-ai.onrender.com` *(veya yerel Cloudflare tüneli)*
-- ⚙️ **Canlı Backend API Sağlık Kontrolü:** `https://sarjdenge-ai.onrender.com/api/health`
+- 🌐 **Canlı Web Uygulaması:** [https://sarjdenge-ai.onrender.com](https://sarjdenge-ai.onrender.com/)
+- 📊 **Proje Sunumu (Canva):** [ŞarjDenge AI — Final Sunumu](https://canva.link/9675ddf04gepgdp)
+- ⚙️ **Canlı Backend API Sağlık Kontrolü:** [https://sarjdenge-ai.onrender.com/api/health](https://sarjdenge-ai.onrender.com/api/health)
 - 📹 **2 Dakikalık Jüri Tanıtım Videosu (YouTube):** [ŞarjDenge AI — Ürün Tanıtımı ve Canlı Demo](https://youtu.be/placeholder)
 - 📋 **Proje Tasarım İncelemesi (PDR Dokümanı):** [`docs/PROJE_GENEL_FAALIYET_VE_SONUC_RAPORU.md`](docs/PROJE_GENEL_FAALIYET_VE_SONUC_RAPORU.md)
 
@@ -65,7 +66,7 @@ Sistem; ham telemetri verisindeki kullanıcı belirsizliklerini **Gradient Boost
 - **Çok Günlü Geniş Analiz ($\ge 20$ Gün):** Geniş takvim kesitinde medyan, p10 ve p90 kapasite gereksinimlerini hesaplayarak uzun vadeli trafo boyutlandırma güvencesi sunar.
 - **Fiziksel İmkânsız Araç Ayrıştırması:** İstasyonda kalış süresi boyunca şebeke sınırsız olsa dahi bataryasını dolduramayacak araçları otomatik tespit eder ve başarı oranını fiziksel olarak karşılanabilir araçlar üzerinden netleştirir.
 
-### 3. Çok Yöntemli Benchmark (9 Algoritma Kıyaslaması)
+### 3. Çok Yöntemli Karşılaştırma (Benchmark)
 - Kural Tabanlı: **FCFS** (İlk Gelen İlk Şarj), **EDF** (En Erken Ayrılacak Olan), **LLF** (En Az Esnekliği Olan), **Eşit Paylaşım (Statik)**.
 - Optimizasyon Tabanlı: **MPC-Beyan** (Kullanıcı beyanına dayalı LP), **MPC-Tahmin** (Güvenli/Dengeli/Nokta model kestirimli LP), **Hibrit Asimetrik Kurallar**.
 
@@ -171,7 +172,7 @@ Temel Simülatör & Veri          Quantile ML & HiGHS MPC        2020 Holdout & 
 
 ### Sprint 4 Detayı (18 – 25 Ekim 2026)
 - **Kapsam:** İkili arama algoritması ile çalışan "Canlı Kapasite Danışmanı" (Capacity Advisor) geliştirildi. 22 Ekim'de simülasyon girdi indekslemesindeki teknik hata tespit edildi ve erratum ile düzeltildi. Tek günlük ve çok günlü modlar optimize edildi (10 sn yanıt süresi). Dockerfile ve Cloudflare dağıtım altyapısı kuruldu. 17/17 Playwright E2E testi tamamlandı.
-- **Sprint Review:** Kapasite Danışmanı tek günlükte ~10 saniyede, 20 günlük sentetik analizde ~57 saniyede tamamlandı. Türkiye apartman senaryosunda 15 kW kapasiteyle 20 aracın %100 hedefe ulaştığı doğrulandı.
+- **Sprint Review:** Kapasite Danışmanı tek günlükte ~10 saniyede, 20 günlük sentetik analizde ~57 saniyede tamamlandı. Türkiye senaryolarında ikili arama mekanizmasıyla asgari trafo kapasitesi belirlendi.
 - **Sprint Retrospective:** Proje tüm bilimsel dürüstlük standartları, test otomasyonu ve çalışan canlı uygulamasıyla teslim aşamasına getirildi.
 
 ---
@@ -192,7 +193,7 @@ Temel Simülatör & Veri          Quantile ML & HiGHS MPC        2020 Holdout & 
 | **2020 Holdout** | 4.043 | 108 | $f = 0.9$ (Geniş) | **$+0.05$ puan** | $[-0.12, +0.22]$ | ❌ **Desteklenmedi** |
 
 ### Neden Desteklenmedi? (Mekanizma Analizi)
-- **Hayalet Kapasite Rezervasyonu Mekanizması:** Güvenli modelleme amacıyla seçilen yüksek enerji hedefi ($q_{80}$), oturumların yaklaşık %12'sinde gerçek ihtiyacın üzerinde kalmaktadır. Dar kapasitede LP çözücüsü bu araçlara erken saatlerde agresif güç ayırır; araç erken ayrıldığında rezerve edilen bu kapasite diğer araçların şarjını kısıtlamış olur.
+- **Hayalet Kapasite Rezervasyonu Çalışma Hipotezi:** Muhafazakar modelleme stratejisinde ($q_{20}$ erken ayrılış ve $q_{80}$ yüksek enerji talebi), LP optimizasyon çözücüsü bu araçlara yapay bir aciliyetle agresif güç tahsis ederken diğer araçların şarjını kısıtlamaktadır. Bu durumun nihai kök neden değil, ampirik verilerle uyumlu bir çalışma hipotezi olduğu not edilmelidir.
 - **Kullanıcı Beyanı Tamponu:** Gerçek sürücüler iş yerinde 7–8 saat kalırken ihtiyaçları 2.5–3 saatte dolmaktadır. Aradaki 4–5 saatlik boş bekleme süresi, sürücülerin beyan hatalarını doğal olarak absorbe etmektedir.
 - **Önemli Çıkarım:** Makine öğrenmesi tahmin doğruluğunun artması (MAE 10.4 kWh'den 3.5 kWh'ye düştü), saf LP optimizasyonunda her zaman daha yüksek şarj başarısına dönüşmemektedir. Kullanıcı beyanına dayalı **EDF (En Erken Ayrılacak Olan)** algoritması en dengeli ve güvenilir yöntem olarak öne çıkmaktadır.
 
