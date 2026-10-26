@@ -3,7 +3,7 @@
 # ⚡ ŞarjDenge AI
 ### Trafo Kapasitesi Altında EV Şarj Planlama ve Dinamik Kapasite Danışmanı
 
-**Climathon 2026*
+**Climathon 2026**
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![Node.js 20](https://img.shields.io/badge/node.js-v20.x-green.svg)](https://nodejs.org/)
