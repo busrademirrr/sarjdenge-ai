@@ -53,7 +53,7 @@ class LRUCache {
   }
 }
 
-export const lruCache = new LRUCache(30);
+export const lruCache = new LRUCache(300);
 const inFlightRequests = new Map();
 
 /**

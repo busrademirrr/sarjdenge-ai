@@ -92,8 +92,8 @@ export async function executePythonAdvisor(params = {}) {
       let responded = false;
       let timedOut = false;
 
-      // Tek gün için 65 sn, çok gün için 210 sn
-      const timeoutLimit = multiDay ? 210000 : 65000;
+      // Tek gün için 92 sn, çok gün için 210 sn (Render proxy limiti ~100 sn)
+      const timeoutLimit = multiDay ? 210000 : 92000;
       const timeoutSec = Math.round(timeoutLimit / 1000);
       const timeoutId = setTimeout(() => {
         timedOut = true;
