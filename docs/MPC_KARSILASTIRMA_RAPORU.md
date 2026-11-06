@@ -1,5 +1,14 @@
 # ŞarjDenge AI — MPC Simülasyonu ve Karar Mekanizması Raporu (İş Paketi D)
 
+> [!WARNING]
+> **ERRATUM / GEÇERSİZLİK VE GÜNCELLEME BİLDİRİMİ (22 Ekim 2026):**
+> Bu raporda yer alan ampirik sonuç tabloları (özellikle Bölüm 2 altındaki $f=0.5$ için $-0.17$ y.p. ve $-0.22$ y.p. değerleri), 22 Ekim 2026 tarihinde tespit edilen simülasyon girdi indeksleme hatasının düzeltilmesinden **önceki** ilk taslak çalıştırmaya aittir ve geçersizdir.
+> Düzeltilmiş kesin ve nihai hipotez sonuçları `data/deney_boot_val_duzeltilmis.csv` dosyasında üretilmiş olup ana `README.md` dosyasında belgelenmiştir:
+> - **2019 H1 Doğrulama ($f=0.5$):** $\Delta = \mathbf{-2.22}$ yüzde puanı (%95 Bootstrap GA: $[-2.97, -1.54]$).
+> - **2019 H2 Dönemler Arası ($f=0.5$):** $\Delta = \mathbf{-2.05}$ yüzde puanı (%95 Bootstrap GA: $[-2.55, -1.53]$).
+> - **2020 Holdout ($f=0.5$):** $\Delta = \mathbf{-1.35}$ yüzde puanı (%95 Bootstrap GA: $[-2.55, -0.18]$).
+> İndeksleme düzeltmesi, ön kayıtlı ana hipotezin desteklenmediği yönündeki temel bilimsel kararı değiştirmemiş; aksine farkın negatif yönde olduğunu daha belirgin hale getirmiştir.
+
 Bu rapor, ŞarjDenge AI projesi kapsamında İş Paketi C'de seçilen GradientBoosting şampiyon modellerinin tahminleri ile beslenen MPC ve kural tabanlı planlayıcıların simülasyon sonuçlarını, ön kayıtlı ana hipotez testlerini, adillik metriklerini ve Temmuz–Aralık 2019 dönemler arası doğrulama bulgularını belgeler.
 
 ---

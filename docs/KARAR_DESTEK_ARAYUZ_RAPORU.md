@@ -1,5 +1,9 @@
 # ŞarjDenge AI — İş Paketi E-UI Tamamlama Raporu: Site Yöneticisi Karar Destek Arayüzü ve Sonuç Raporlaması
 
+> [!WARNING]
+> **ERRATUM / GEÇERSİZLİK BİLDİRİMİ (22 Ekim 2026):**
+> Bu raporda yer alan ampirik değerler (özellikle Bölüm 3.A altındaki $f=0.5$ için $-0.17$ y.p. değeri), 22 Ekim 2026 indeksleme düzeltmesi öncesine aittir. Düzeltilmiş kesin değerler `data/deney_boot_val_duzeltilmis.csv` ve `README.md` dosyasında yer almaktadır (2019 H1 $f=0.5$ için düzeltilmiş nihai fark: **$-2.22$ yüzde puanı**, %95 GA: $[-2.97, -1.54]$).
+
 **Tarih:** 17 Ekim 2026
 **Durum:** Tamamlandı, Doğrulandı ve Test Edildi (48/48 Python + 5/5 Node.js + 5/5 E2E Başarılı)
 **Kapsam:** React + Tailwind CSS Frontend, Node.js Express API, Python ML/MPC Simülasyon Köprüsü, Açıklanabilirlik ("Neden?") Paneli, Bilimsel Şeffaflık Bildirimi
